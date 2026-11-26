@@ -4,12 +4,12 @@ export function SafetyBanner({ compact = false }: { compact?: boolean }) {
   return (
     <div
       role="note"
-      className={`rounded-2xl border border-terracotta/30 bg-terracotta/10 text-charcoal ${
+      className={`rounded-2xl border border-terracotta/30 bg-terracotta/10 text-ink ${
         compact ? "px-3.5 py-3 text-xs" : "px-4 py-3.5 text-sm"
       }`}
     >
       <p className="font-semibold text-terracotta-deep">Allergy safety</p>
-      <p className={`mt-1 leading-relaxed text-charcoal-soft ${compact ? "text-xs" : ""}`}>
+      <p className={`mt-1 leading-relaxed text-ink-soft ${compact ? "text-xs" : ""}`}>
         {SAFETY_COPY.banner}
       </p>
     </div>

@@ -3,33 +3,43 @@
 @tailwind utilities;
 
 :root {
-  --cream: #faf8f3;
-  --forest: #173f35;
-  --forest-mid: #397b60;
-  --terracotta: #e87950;
-  --ink: #202522;
-  --surface: #ffffff;
-  --bg: #faf8f3;
-  --card: #ffffff;
-  --border: #e8e4db;
-  --muted: #6b736e;
+  --cream: #faf7f0;
+  --sand: #f1ece3;
+  --card: #fffdf9;
+  --forest: #344e41;
+  --forest-mid: #879b7c;
+  --terracotta: #c9856b;
+  --ink: #303a32;
+  --ink-soft: #62675e;
+  --border: #e8dfd0;
+  --surface: #fffdf9;
+  --bg: #faf7f0;
+  --muted: #62675e;
 }
 
+/* Optional dark — never the default. Tuned for contrast, not pure black. */
 .dark {
-  --cream: #121614;
-  --forest: #8fceb4;
-  --forest-mid: #397b60;
-  --terracotta: #e87950;
-  --ink: #f3f1ec;
-  --surface: #1a1f1c;
-  --bg: #121614;
-  --card: #1a1f1c;
-  --border: #2c3430;
-  --muted: #9aa39c;
+  --cream: #1c2420;
+  --sand: #24302a;
+  --card: #24302a;
+  --forest: #c5d4bc;
+  --forest-mid: #879b7c;
+  --terracotta: #d4a08c;
+  --ink: #f4f1ea;
+  --ink-soft: #c4c8c0;
+  --border: #3a4540;
+  --surface: #24302a;
+  --bg: #1c2420;
+  --muted: #a8aea6;
 }
 
 html {
   scroll-behavior: smooth;
+  color-scheme: light;
+}
+
+html.dark {
+  color-scheme: dark;
 }
 
 body {
@@ -39,7 +49,7 @@ body {
 }
 
 ::selection {
-  background: rgba(232, 121, 80, 0.28);
+  background: rgba(201, 133, 107, 0.28);
 }
 
 @layer utilities {
@@ -61,6 +71,10 @@ body {
   .pb-nav {
     padding-bottom: calc(5.5rem + env(safe-area-inset-bottom));
   }
+
+  .pb-composer {
+    padding-bottom: calc(7.5rem + env(safe-area-inset-bottom));
+  }
 }
 
 @layer components {
@@ -69,7 +83,7 @@ body {
   }
 
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 rounded-full border border-forest/15 bg-white/70 px-5 py-3 text-sm font-semibold text-forest transition hover:border-forest/30 hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest dark:border-white/15 dark:bg-white/5 dark:text-cream dark:hover:bg-white/10;
+    @apply inline-flex items-center justify-center gap-2 rounded-full border border-mist bg-card px-5 py-3 text-sm font-semibold text-forest transition hover:border-forest/25 hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest dark:border-border dark:bg-card dark:text-cream dark:hover:bg-sand;
   }
 
   .chip {
@@ -77,18 +91,26 @@ body {
   }
 
   .chip-idle {
-    @apply border-mist bg-white/80 text-ink-soft hover:border-forest/25 dark:border-white/10 dark:bg-white/5 dark:text-cream;
+    @apply border-mist bg-card text-ink-soft hover:border-forest/25 dark:border-border dark:bg-card dark:text-cream;
   }
 
   .chip-active {
-    @apply border-forest bg-forest text-cream dark:border-forest-mid dark:bg-forest-mid dark:text-white;
+    @apply border-forest bg-forest text-cream;
   }
 
   .input-field {
-    @apply w-full rounded-2xl border border-mist bg-white px-4 py-3.5 text-ink outline-none transition placeholder:text-ink-muted focus:border-forest/40 focus:ring-2 focus:ring-forest/10 dark:border-white/10 dark:bg-white/5 dark:text-cream dark:placeholder:text-ink-muted;
+    @apply w-full rounded-2xl border border-mist bg-card px-4 py-3.5 text-ink outline-none transition placeholder:text-ink-muted focus:border-forest/35 focus:ring-2 focus:ring-forest/10 dark:border-border dark:bg-sand dark:text-cream dark:placeholder:text-ink-muted;
   }
 
   .card-surface {
-    @apply rounded-3xl border border-mist/80 bg-white shadow-card dark:border-white/10 dark:bg-[#1a1f1c];
+    @apply rounded-3xl border border-mist/90 bg-card shadow-card dark:border-border;
+  }
+
+  .msg-user {
+    @apply ml-auto max-w-[85%] rounded-3xl rounded-br-lg bg-forest px-4 py-3 text-sm leading-relaxed text-cream;
+  }
+
+  .msg-assistant {
+    @apply mr-auto max-w-[90%] rounded-3xl rounded-bl-lg border border-mist bg-card px-4 py-3 text-sm leading-relaxed text-ink shadow-card dark:border-border;
   }
 }

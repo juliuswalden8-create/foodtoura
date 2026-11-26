@@ -2,14 +2,14 @@
 
 import { useEffect, useState } from "react";
 
+/** Dark mode is opt-in only — never follows OS by default. */
 export function ThemeToggle() {
   const [dark, setDark] = useState(false);
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
     const stored = localStorage.getItem("foodtoura.theme");
-    const prefers = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    const next = stored ? stored === "dark" : prefers;
+    const next = stored === "dark";
     setDark(next);
     document.documentElement.classList.toggle("dark", next);
     setReady(true);
@@ -30,8 +30,9 @@ export function ThemeToggle() {
     <button
       type="button"
       onClick={toggle}
-      className="flex h-9 w-9 items-center justify-center rounded-full border border-mist text-forest transition hover:border-forest/30 dark:border-white/15 dark:text-cream"
+      className="flex h-9 w-9 items-center justify-center rounded-full border border-mist text-forest transition hover:border-forest/30 dark:border-border dark:text-cream"
       aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}
+      title={dark ? "Light mode" : "Dark mode (optional)"}
     >
       {dark ? (
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>

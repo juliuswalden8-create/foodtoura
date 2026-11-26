@@ -1,455 +1,491 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import {
+  FormEvent,
+  KeyboardEvent,
+  Suspense,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+import Image from "next/image";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { DemoModeBanner } from "@/components/DemoModeBanner";
-import { SafetyBanner } from "@/components/SafetyBanner";
+import { ChatRestaurantCard } from "@/components/guide/ChatRestaurantCard";
+import { fetchDiscover } from "@/lib/discover-client";
 import {
   defaultDiscoveryState,
-  loadDiscoveryState,
   saveDiscoveryState,
 } from "@/lib/discovery-store";
-import { parsePreferences } from "@/lib/preference-parser";
-import type { DiscoveryState } from "@/lib/types";
-import { EU_ALLERGENS } from "@/lib/allergens";
+import {
+  clearGuideSession,
+  interpretTurn,
+  loadGuideSession,
+  saveGuideSession,
+  STARTERS,
+  uid,
+  type ChatMessage,
+  type GuideSession,
+} from "@/lib/guide-chat";
+import { rankRestaurants } from "@/lib/ranking";
+import { loadTaste } from "@/lib/taste-profile";
 
-function GuideInner() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const [text, setText] = useState("");
-  const [parsing, setParsing] = useState(false);
-  const [state, setState] = useState<DiscoveryState>(defaultDiscoveryState);
-  const [notes, setNotes] = useState<string[]>([]);
-  const [ready, setReady] = useState(false);
-
-  useEffect(() => {
-    const loaded = loadDiscoveryState();
-    const q = searchParams.get("q");
-    if (q) {
-      loaded.food.freeText = q;
-      setText(q);
-    } else {
-      setText(loaded.food.freeText || "");
-    }
-    setState(loaded);
-    setReady(true);
-  }, [searchParams]);
-
-  async function parse() {
-    if (!text.trim()) return;
-    setParsing(true);
-    try {
-      const parsed = await parsePreferences(text);
-      setState((s) => {
-        const next: DiscoveryState = {
-          ...s,
-          location: {
-            ...s.location,
-            city: parsed.city || s.location.city,
-            country:
-              parsed.country ||
-              s.location.country ||
-              (parsed.city === "Lisbon"
-                ? "Portugal"
-                : parsed.city === "Barcelona" || parsed.city === "Marbella"
-                  ? "Spain"
-                  : s.location.country),
-            neighborhood: parsed.neighborhood || s.location.neighborhood,
-            maxDistanceKm:
-              parsed.maxDistanceKm ?? s.location.maxDistanceKm,
-          },
-          guests: {
-            ...s.guests,
-            adults: parsed.partySize ?? s.guests.adults,
-            children: parsed.children ?? s.guests.children,
-            infants: parsed.infants ?? s.guests.infants,
-          },
-          food: {
-            ...s.food,
-            freeText: text,
-            cuisines: Array.from(
-              new Set([...s.food.cuisines, ...parsed.cuisines]),
-            ),
-            outdoorSeating: parsed.outdoorSeating ?? s.food.outdoorSeating,
-            livelyAtmosphere:
-              parsed.livelyAtmosphere ?? s.food.livelyAtmosphere,
-            maxBudgetPerPerson:
-              parsed.maxBudgetPerPerson ?? s.food.maxBudgetPerPerson,
-            maxBudgetGroup: parsed.maxBudgetGroup ?? s.food.maxBudgetGroup,
-            accessibilityNeeds:
-              parsed.accessibilityNeeds ?? s.food.accessibilityNeeds,
-            atmosphere: Array.from(
-              new Set([
-                ...(s.food.atmosphere || []),
-                ...(parsed.atmosphere || []),
-              ]),
-            ),
-            parsedNotes: parsed.notes,
-          },
-          allergens: (() => {
-            const map = new Map(s.allergens.map((a) => [a.allergen, a]));
-            for (const a of parsed.allergens) map.set(a.allergen, a);
-            return Array.from(map.values());
-          })(),
-          dietary: Array.from(new Set([...s.dietary, ...parsed.dietary])),
-        };
-        return next;
-      });
-      setNotes(parsed.notes);
-    } finally {
-      setParsing(false);
-    }
-  }
-
-  function search() {
-    const next = { ...state, food: { ...state.food, freeText: text } };
-    saveDiscoveryState(next);
-    router.push("/discover/results");
-  }
-
-  if (!ready) {
-    return (
-      <div className="mx-auto max-w-2xl px-4 py-12">
-        <div className="skeleton h-40 w-full" />
-      </div>
-    );
-  }
-
+function TypingDots() {
   return (
-    <div className="mx-auto max-w-2xl px-4 py-8 sm:px-6 sm:py-12">
-      <p className="text-sm font-medium text-terracotta">AI Guide</p>
-      <h1 className="mt-1 font-display text-3xl font-semibold text-forest dark:text-cream">
-        Tell us what you need
-      </h1>
-      <p className="mt-2 text-ink-soft">
-        Natural language becomes structured search params you can edit before
-        running. Allergy safety stays a hard filter — never buried in match %.
-      </p>
-
-      <div className="mt-5 space-y-3">
-        <DemoModeBanner compact />
-        <SafetyBanner compact />
-      </div>
-
-      <div className="card-surface mt-6 space-y-4 p-5">
-        <textarea
-          className="input-field min-h-[140px]"
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          placeholder='We are six friends visiting Barcelona. We want authentic Spanish food, outdoor seating, a lively atmosphere and a maximum budget of €35 per person. One person has a severe peanut allergy.'
-        />
-        <button
-          type="button"
-          className="btn-secondary"
-          disabled={parsing || !text.trim()}
-          onClick={parse}
-        >
-          {parsing ? "Interpreting…" : "Parse into structured params"}
-        </button>
-        {notes.length > 0 && (
-          <ul className="rounded-2xl bg-forest/5 px-4 py-3 text-sm text-forest dark:bg-forest-mid/20 dark:text-cream">
-            {notes.map((n) => (
-              <li key={n}>· {n}</li>
-            ))}
-          </ul>
-        )}
-      </div>
-
-      <div className="card-surface mt-6 space-y-4 p-5">
-        <h2 className="font-display text-xl font-semibold text-forest dark:text-cream">
-          Edit before search
-        </h2>
-
-        <div className="grid gap-3 sm:grid-cols-2">
-          <Field label="Country (optional)">
-            <input
-              className="input-field"
-              value={state.location.country}
-              onChange={(e) =>
-                setState({
-                  ...state,
-                  location: { ...state.location, country: e.target.value },
-                })
-              }
-            />
-          </Field>
-          <Field label="City (mandatory)">
-            <input
-              className="input-field"
-              value={state.location.city}
-              onChange={(e) =>
-                setState({
-                  ...state,
-                  location: { ...state.location, city: e.target.value },
-                })
-              }
-            />
-          </Field>
-          <Field label="Neighborhood">
-            <input
-              className="input-field"
-              value={state.location.neighborhood}
-              onChange={(e) =>
-                setState({
-                  ...state,
-                  location: {
-                    ...state.location,
-                    neighborhood: e.target.value,
-                  },
-                })
-              }
-            />
-          </Field>
-          <Field label="Max distance (km)">
-            <input
-              type="number"
-              className="input-field"
-              value={state.location.maxDistanceKm}
-              onChange={(e) =>
-                setState({
-                  ...state,
-                  location: {
-                    ...state.location,
-                    maxDistanceKm: Number(e.target.value),
-                  },
-                })
-              }
-            />
-          </Field>
-          <Field label="Adults">
-            <input
-              type="number"
-              min={1}
-              className="input-field"
-              value={state.guests.adults}
-              onChange={(e) =>
-                setState({
-                  ...state,
-                  guests: { ...state.guests, adults: Number(e.target.value) },
-                })
-              }
-            />
-          </Field>
-          <Field label="Children">
-            <input
-              type="number"
-              min={0}
-              className="input-field"
-              value={state.guests.children}
-              onChange={(e) =>
-                setState({
-                  ...state,
-                  guests: {
-                    ...state.guests,
-                    children: Number(e.target.value),
-                  },
-                })
-              }
-            />
-          </Field>
-          <Field label="Date">
-            <input
-              type="date"
-              className="input-field"
-              value={state.guests.date}
-              onChange={(e) =>
-                setState({
-                  ...state,
-                  guests: { ...state.guests, date: e.target.value },
-                })
-              }
-            />
-          </Field>
-          <Field label="Time">
-            <input
-              type="time"
-              className="input-field"
-              value={state.guests.preferredTime}
-              onChange={(e) =>
-                setState({
-                  ...state,
-                  guests: { ...state.guests, preferredTime: e.target.value },
-                })
-              }
-            />
-          </Field>
-          <Field label="Budget / person (€)">
-            <input
-              type="number"
-              className="input-field"
-              value={state.food.maxBudgetPerPerson ?? ""}
-              onChange={(e) =>
-                setState({
-                  ...state,
-                  food: {
-                    ...state.food,
-                    maxBudgetPerPerson: e.target.value
-                      ? Number(e.target.value)
-                      : undefined,
-                  },
-                })
-              }
-            />
-          </Field>
-          <Field label="Transport">
-            <select
-              className="input-field"
-              value={state.location.travelMode}
-              onChange={(e) =>
-                setState({
-                  ...state,
-                  location: {
-                    ...state.location,
-                    travelMode: e.target.value as never,
-                  },
-                })
-              }
-            >
-              <option value="walking">Walking</option>
-              <option value="transit">Transit</option>
-              <option value="driving">Driving</option>
-            </select>
-          </Field>
-        </div>
-
-        <div>
-          <p className="mb-2 text-sm font-medium">Cuisines</p>
-          <p className="text-sm text-ink-soft">
-            {state.food.cuisines.length
-              ? state.food.cuisines.join(", ")
-              : "None yet — parse text or use the wizard"}
-          </p>
-        </div>
-
-        <div>
-          <p className="mb-2 text-sm font-medium">Allergens (mandatory safety)</p>
-          <div className="flex flex-wrap gap-2">
-            {state.allergens.map((a) => (
-              <span key={a.allergen} className="chip chip-active text-xs">
-                {EU_ALLERGENS.find((x) => x.id === a.allergen)?.short} ·{" "}
-                {a.severity}
-              </span>
-            ))}
-            {state.allergens.length === 0 && (
-              <span className="text-sm text-ink-muted">None flagged</span>
-            )}
-          </div>
-        </div>
-
-        <div>
-          <p className="mb-2 text-sm font-medium">Mandatory filters</p>
-          <div className="flex flex-wrap gap-2">
-            {(
-              [
-                ["city", "City"],
-                ["allergens", "Allergies (safety)"],
-                ["dietary", "Diet"],
-                ["budget", "Budget"],
-                ["cuisine", "Cuisine"],
-              ] as const
-            ).map(([key, label]) => (
-              <button
-                key={key}
-                type="button"
-                className={`chip text-xs ${state.mandatory[key] ? "chip-active" : "chip-idle"}`}
-                onClick={() =>
-                  setState({
-                    ...state,
-                    mandatory: {
-                      ...state.mandatory,
-                      [key]: !state.mandatory[key],
-                    },
-                  })
-                }
-                disabled={key === "allergens"}
-                title={
-                  key === "allergens"
-                    ? "Medical allergy conflicts stay mandatory"
-                    : undefined
-                }
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-          <p className="mt-2 text-xs text-ink-muted">
-            Allergen safety conflicts cannot be relaxed. Other mandatory flags
-            hard-filter; the rest influence ranking and explanations.
-          </p>
-        </div>
-
-        <label className="flex items-center gap-3 text-sm">
-          <input
-            type="checkbox"
-            className="accent-terracotta"
-            checked={!!state.food.outdoorSeating}
-            onChange={(e) =>
-              setState({
-                ...state,
-                food: { ...state.food, outdoorSeating: e.target.checked },
-              })
-            }
-          />
-          Outdoor seating
-        </label>
-        <label className="flex items-center gap-3 text-sm">
-          <input
-            type="checkbox"
-            className="accent-terracotta"
-            checked={!!state.food.livelyAtmosphere}
-            onChange={(e) =>
-              setState({
-                ...state,
-                food: { ...state.food, livelyAtmosphere: e.target.checked },
-              })
-            }
-          />
-          Lively atmosphere
-        </label>
-        <label className="flex items-center gap-3 text-sm">
-          <input
-            type="checkbox"
-            className="accent-terracotta"
-            checked={!!state.food.accessibilityNeeds}
-            onChange={(e) =>
-              setState({
-                ...state,
-                food: {
-                  ...state.food,
-                  accessibilityNeeds: e.target.checked,
-                  wheelchairAccessible: e.target.checked,
-                },
-              })
-            }
-          />
-          Accessibility needs
-        </label>
-
-        <button
-          type="button"
-          className="btn-primary w-full"
-          disabled={!state.location.city}
-          onClick={search}
-        >
-          Find restaurants
-        </button>
-      </div>
+    <div className="msg-assistant flex items-center gap-1.5 py-4">
+      <span className="h-2 w-2 animate-pulse-dot rounded-full bg-forest-mid" />
+      <span
+        className="h-2 w-2 animate-pulse-dot rounded-full bg-forest-mid"
+        style={{ animationDelay: "0.15s" }}
+      />
+      <span
+        className="h-2 w-2 animate-pulse-dot rounded-full bg-forest-mid"
+        style={{ animationDelay: "0.3s" }}
+      />
     </div>
   );
 }
 
-function Field({
-  label,
-  children,
-}: {
-  label: string;
-  children: React.ReactNode;
-}) {
+function GuideInner() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [session, setSession] = useState<GuideSession | null>(null);
+  const [draft, setDraft] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [liveHint, setLiveHint] = useState<string | null>(null);
+  const bottomRef = useRef<HTMLDivElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+  const userNearBottom = useRef(true);
+
+  useEffect(() => {
+    const loaded = loadGuideSession();
+    const q = searchParams.get("q");
+    setSession(loaded);
+    if (q && loaded.messages.length === 0) {
+      setDraft(q);
+    }
+    fetch("/api/discover")
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.dataMode !== "live") {
+          setLiveHint(
+            "Preview restaurants are shown until a Google Places key is connected on the server.",
+          );
+        }
+      })
+      .catch(() => {});
+  }, [searchParams]);
+
+  useEffect(() => {
+    if (!session) return;
+    saveGuideSession(session);
+    saveDiscoveryState(session.state);
+  }, [session]);
+
+  useEffect(() => {
+    if (!userNearBottom.current) return;
+    bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+  }, [session?.messages, busy]);
+
+  function onScroll() {
+    const el = listRef.current;
+    if (!el) return;
+    const dist = el.scrollHeight - el.scrollTop - el.clientHeight;
+    userNearBottom.current = dist < 120;
+  }
+
+  async function runSearch(
+    base: GuideSession,
+    introText: string,
+    suggestions: string[],
+  ) {
+    setBusy(true);
+    try {
+      const provider = await fetchDiscover(base.state);
+      const ranked = rankRestaurants(
+        provider.restaurants,
+        base.state,
+        loadTaste(),
+      ).filter((r) => r.safetyLevel !== "conflict");
+      const top = ranked.slice(0, 4);
+
+      let text = introText;
+      if (top.length === 0) {
+        text =
+          provider.mode === "live"
+            ? "I couldn't find a good match with those filters. Want to loosen the budget or walk a little further?"
+            : "I don't have preview places for that city yet. Try Barcelona or Lisbon — or connect Google Places for worldwide results.";
+      } else if (provider.mode === "demo") {
+        text = `${introText}\n\nThese are carefully curated preview restaurants for tasting FoodToura — not a live city inventory.`;
+      }
+
+      const assistant: ChatMessage = {
+        id: uid(),
+        role: "assistant",
+        text,
+        createdAt: new Date().toISOString(),
+        suggestions:
+          top.length > 0
+            ? suggestions
+            : ["Try Barcelona", "Try Lisbon", "Something cheaper", "New search"],
+        restaurants:
+          top.length > 0
+            ? {
+                restaurants: top,
+                mode: provider.mode,
+                attribution: provider.attribution,
+              }
+            : undefined,
+      };
+
+      setSession({
+        ...base,
+        messages: [...base.messages, assistant],
+      });
+    } catch (e) {
+      const assistant: ChatMessage = {
+        id: uid(),
+        role: "assistant",
+        text: "I hit a snag looking that up. Shall we try again?",
+        createdAt: new Date().toISOString(),
+        error: e instanceof Error ? e.message : "Search failed",
+        suggestions: ["Try again", "Barcelona Italian under €35", "New conversation"],
+      };
+      setSession({
+        ...base,
+        messages: [...base.messages, assistant],
+      });
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function send(text: string) {
+    if (!session || !text.trim() || busy) return;
+    const trimmed = text.trim();
+
+    if (/^new conversation$/i.test(trimmed)) {
+      clearGuideSession();
+      setSession({
+        messages: [],
+        state: loadGuideSession().state,
+        askedDistance: false,
+      });
+      setDraft("");
+      return;
+    }
+
+    if (/^try again$/i.test(trimmed) && session.messages.length) {
+      const lastUser = [...session.messages].reverse().find((m) => m.role === "user");
+      if (lastUser) {
+        await send(lastUser.text);
+      }
+      return;
+    }
+
+    if (/^open the full list$/i.test(trimmed)) {
+      saveDiscoveryState(session.state);
+      router.push("/discover/results");
+      return;
+    }
+
+    // Refine follow-ups on existing search
+    let working = { ...session };
+    if (/something cheaper/i.test(trimmed) && working.state.food.maxBudgetPerPerson) {
+      working = {
+        ...working,
+        state: {
+          ...working.state,
+          food: {
+            ...working.state.food,
+            maxBudgetPerPerson: Math.max(
+              10,
+              working.state.food.maxBudgetPerPerson - 10,
+            ),
+          },
+        },
+      };
+    }
+    if (/closer to me/i.test(trimmed)) {
+      working = {
+        ...working,
+        state: {
+          ...working.state,
+          location: {
+            ...working.state.location,
+            maxDistanceKm: Math.max(
+              0.8,
+              working.state.location.maxDistanceKm * 0.6,
+            ),
+          },
+        },
+      };
+    }
+    if (/more romantic/i.test(trimmed)) {
+      working = {
+        ...working,
+        state: {
+          ...working.state,
+          food: {
+            ...working.state.food,
+            atmosphere: Array.from(
+              new Set([
+                ...(working.state.food.atmosphere || []),
+                "romantic",
+                "quiet",
+              ]),
+            ),
+          },
+        },
+      };
+    }
+
+    const userMsg: ChatMessage = {
+      id: uid(),
+      role: "user",
+      text: trimmed,
+      createdAt: new Date().toISOString(),
+    };
+
+    const withUser: GuideSession = {
+      ...working,
+      messages: [...working.messages, userMsg],
+    };
+    setSession(withUser);
+    setDraft("");
+    setBusy(true);
+
+    // Brief pause so typing feels human
+    await new Promise((r) => setTimeout(r, 420));
+
+    const turn = interpretTurn(trimmed, withUser);
+    const nextSession: GuideSession = {
+      ...withUser,
+      state: turn.state,
+      askedDistance: turn.askedDistance,
+    };
+
+    if (!turn.shouldSearch) {
+      const assistant: ChatMessage = {
+        id: uid(),
+        role: "assistant",
+        text: turn.reply,
+        createdAt: new Date().toISOString(),
+        suggestions: turn.suggestions,
+      };
+      setSession({
+        ...nextSession,
+        messages: [...nextSession.messages, assistant],
+      });
+      setBusy(false);
+      return;
+    }
+
+    // Show interim message then search
+    const interim: ChatMessage = {
+      id: uid(),
+      role: "assistant",
+      text: turn.reply.startsWith("Here are")
+        ? "Finding places that feel right…"
+        : turn.reply,
+      createdAt: new Date().toISOString(),
+    };
+    const searchingSession: GuideSession = {
+      ...nextSession,
+      messages: [...nextSession.messages, interim],
+    };
+    setSession(searchingSession);
+    await runSearch(
+      searchingSession,
+      "Here are some lovely options that match what you're looking for.",
+      turn.suggestions,
+    );
+  }
+
+  function onSubmit(e: FormEvent) {
+    e.preventDefault();
+    void send(draft);
+  }
+
+  function onKeyDown(e: KeyboardEvent<HTMLTextAreaElement>) {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      void send(draft);
+    }
+  }
+
+  function newChat() {
+    clearGuideSession();
+    setSession({
+      messages: [],
+      state: defaultDiscoveryState(),
+      askedDistance: false,
+    });
+    setDraft("");
+    inputRef.current?.focus();
+  }
+
+  if (!session) {
+    return (
+      <div className="mx-auto max-w-2xl px-4 py-16">
+        <div className="skeleton h-64 w-full rounded-3xl" />
+      </div>
+    );
+  }
+
+  const empty = session.messages.length === 0;
+
   return (
-    <label className="block text-sm">
-      <span className="mb-1.5 block font-medium text-ink-soft">{label}</span>
-      {children}
-    </label>
+    <div className="relative mx-auto flex min-h-[calc(100dvh-8rem)] max-w-2xl flex-col">
+      {/* Header */}
+      <div className="sticky top-0 z-20 border-b border-mist/80 bg-cream/90 px-4 py-3 backdrop-blur-md dark:border-border dark:bg-[#1c2420]/90 sm:px-6">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <p className="text-xs font-medium uppercase tracking-wide text-terracotta">
+              Your local guide
+            </p>
+            <h1 className="font-display text-xl font-semibold text-forest dark:text-cream sm:text-2xl">
+              Let&apos;s find somewhere lovely.
+            </h1>
+          </div>
+          <button
+            type="button"
+            onClick={newChat}
+            className="btn-secondary !px-3 !py-2 text-xs"
+          >
+            New chat
+          </button>
+        </div>
+        {liveHint && (
+          <p className="mt-2 text-[11px] leading-relaxed text-ink-muted">
+            {liveHint} Allergy safety is always checked carefully.
+          </p>
+        )}
+      </div>
+
+      {/* Messages */}
+      <div
+        ref={listRef}
+        onScroll={onScroll}
+        className="flex-1 space-y-4 overflow-y-auto px-4 py-5 sm:px-6"
+      >
+        {empty && (
+          <div className="animate-fade-up">
+            <div className="relative mb-5 aspect-[16/9] overflow-hidden rounded-[1.75rem]">
+              <Image
+                src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1200&q=80"
+                alt="Warm candlelit dinner table"
+                fill
+                className="object-cover"
+                sizes="672px"
+                priority
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-cream via-cream/20 to-transparent dark:from-[#1c2420]" />
+            </div>
+            <p className="font-display text-2xl font-semibold text-forest dark:text-cream">
+              Your personal food guide, wherever you are.
+            </p>
+            <p className="mt-2 text-sm text-ink-soft">
+              Write naturally — like messaging a friend who knows the city. I&apos;ll
+              ask only what I need, then show places you can save and visit.
+            </p>
+            <div className="mt-5 flex flex-wrap gap-2">
+              {STARTERS.map((s) => (
+                <button
+                  key={s}
+                  type="button"
+                  className="chip chip-idle max-w-full text-left text-xs"
+                  onClick={() => void send(s)}
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {session.messages.map((m) => (
+          <div key={m.id} className="animate-fade-up space-y-3">
+            <div className={m.role === "user" ? "msg-user" : "msg-assistant"}>
+              <p className="whitespace-pre-wrap">{m.text}</p>
+              {m.error && (
+                <p className="mt-2 text-xs text-terracotta-deep">{m.error}</p>
+              )}
+            </div>
+            {m.restaurants && (
+              <div className="space-y-3">
+                {m.restaurants.restaurants.map((r) => (
+                  <ChatRestaurantCard key={r.id} restaurant={r} />
+                ))}
+                <p className="text-[11px] text-ink-muted">
+                  {m.restaurants.mode === "live"
+                    ? "Live venue data · verify allergens with the restaurant."
+                    : "Preview places · verify allergens with the restaurant."}
+                </p>
+                <Link
+                  href="/discover/results"
+                  className="text-xs font-semibold text-terracotta"
+                >
+                  See the full list →
+                </Link>
+              </div>
+            )}
+            {m.suggestions && m.suggestions.length > 0 && !busy && (
+              <div className="flex flex-wrap gap-2">
+                {m.suggestions.map((s) => (
+                  <button
+                    key={s}
+                    type="button"
+                    className="chip chip-idle text-xs"
+                    onClick={() => void send(s)}
+                  >
+                    {s}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        ))}
+
+        {busy && <TypingDots />}
+        <div ref={bottomRef} />
+      </div>
+
+      {/* Composer */}
+      <div className="sticky bottom-[calc(3.75rem+env(safe-area-inset-bottom))] z-20 border-t border-mist/80 bg-cream/95 px-3 py-3 backdrop-blur-md dark:border-border dark:bg-[#1c2420]/95 sm:px-6">
+        <form
+          onSubmit={onSubmit}
+          className="flex items-end gap-2 rounded-3xl border border-mist bg-card p-2 shadow-soft dark:border-border"
+        >
+          <label className="sr-only" htmlFor="guide-composer">
+            Message your local guide
+          </label>
+          <textarea
+            id="guide-composer"
+            ref={inputRef}
+            rows={1}
+            className="max-h-32 min-h-[44px] flex-1 resize-none bg-transparent px-3 py-2.5 text-sm text-ink outline-none placeholder:text-ink-muted dark:text-cream"
+            placeholder="Tell me what you're craving…"
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+            onKeyDown={onKeyDown}
+            disabled={busy}
+          />
+          <button
+            type="submit"
+            className="btn-primary !rounded-full !px-4 !py-2.5"
+            disabled={busy || !draft.trim()}
+            aria-label="Send"
+          >
+            Send
+          </button>
+        </form>
+        <p className="mt-1.5 px-1 text-[10px] text-ink-muted">
+          Enter to send · Shift+Enter for a new line
+        </p>
+      </div>
+    </div>
   );
 }
 
@@ -457,8 +493,8 @@ export default function GuidePage() {
   return (
     <Suspense
       fallback={
-        <div className="mx-auto max-w-2xl px-4 py-12">
-          <div className="skeleton h-40 w-full" />
+        <div className="mx-auto max-w-2xl px-4 py-16">
+          <div className="skeleton h-64 w-full rounded-3xl" />
         </div>
       }
     >

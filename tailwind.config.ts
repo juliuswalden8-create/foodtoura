@@ -10,38 +10,40 @@ export default {
   theme: {
     extend: {
       colors: {
-        cream: "#FAF8F3",
+        cream: "#FAF7F0",
+        sand: "#F1ECE3",
+        card: "#FFFDF9",
         forest: {
-          DEFAULT: "#173F35",
-          mid: "#397B60",
-          soft: "#2A5A4C",
-          muted: "#3D6B5C",
+          DEFAULT: "#344E41",
+          mid: "#879B7C",
+          soft: "#4A6354",
+          muted: "#5C7364",
         },
         terracotta: {
-          DEFAULT: "#E87950",
-          soft: "#F09474",
-          deep: "#C45E38",
+          DEFAULT: "#C9856B",
+          soft: "#D4A08C",
+          deep: "#A86B52",
         },
         ink: {
-          DEFAULT: "#202522",
-          soft: "#3A403C",
-          muted: "#6B736E",
+          DEFAULT: "#303A32",
+          soft: "#62675E",
+          muted: "#7A7F76",
         },
         charcoal: {
-          DEFAULT: "#202522",
-          soft: "#3A403C",
-          muted: "#6B736E",
+          DEFAULT: "#303A32",
+          soft: "#62675E",
+          muted: "#7A7F76",
         },
-        sand: "#EFEAE0",
-        mist: "#E8E4DB",
+        mist: "#E8DFD0",
+        border: "#E8DFD0",
       },
       fontFamily: {
         display: ["var(--font-display)", "Georgia", "serif"],
         sans: ["var(--font-sans)", "ui-sans-serif", "sans-serif"],
       },
       boxShadow: {
-        soft: "0 8px 30px rgba(23, 63, 53, 0.08)",
-        card: "0 4px 20px rgba(23, 63, 53, 0.06)",
+        soft: "0 8px 30px rgba(52, 78, 65, 0.08)",
+        card: "0 4px 24px rgba(52, 78, 65, 0.06)",
       },
       keyframes: {
         "fade-up": {
@@ -60,12 +62,17 @@ export default {
           "0%, 100%": { transform: "translateX(0)" },
           "50%": { transform: "translateX(6px)" },
         },
+        pulseDot: {
+          "0%, 100%": { opacity: "0.35" },
+          "50%": { opacity: "1" },
+        },
       },
       animation: {
         "fade-up": "fade-up 0.45s ease-out both",
         "fade-in": "fade-in 0.35s ease-out both",
         shimmer: "shimmer 1.4s linear infinite",
         "swipe-hint": "swipeHint 1.6s ease-in-out infinite",
+        "pulse-dot": "pulseDot 1s ease-in-out infinite",
       },
     },
   },

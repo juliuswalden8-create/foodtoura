@@ -1,14 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { DEMO_ATTRIBUTION, LIVE_ATTRIBUTION } from "@/lib/provider";
 
 export function DemoModeBanner({
   compact = false,
   mode,
 }: {
   compact?: boolean;
-  /** When known from an API response, prefer this over probing */
   mode?: "demo" | "live";
 }) {
   const [resolved, setResolved] = useState<"demo" | "live" | "unknown">(
@@ -40,21 +38,19 @@ export function DemoModeBanner({
   return (
     <div
       role="status"
-      className={`rounded-2xl border text-forest dark:text-cream ${
+      className={`rounded-2xl border ${
         isLive
-          ? "border-forest/40 bg-forest/10 dark:border-forest-mid/50 dark:bg-forest-mid/20"
-          : "border-forest-mid/30 bg-forest-mid/10 dark:border-forest-mid/40 dark:bg-forest-mid/20"
+          ? "border-forest-mid/40 bg-forest-mid/10 text-forest dark:text-cream"
+          : "border-mist bg-sand/80 text-ink-soft dark:border-border dark:bg-sand dark:text-cream"
       } ${compact ? "px-3 py-2 text-[11px]" : "px-4 py-3 text-xs sm:text-sm"}`}
     >
-      <p className="font-semibold tracking-wide">
-        {isLive ? "Live Places data" : "Fictional demo mode"}
+      <p className="font-semibold tracking-wide text-forest dark:text-cream">
+        {isLive ? "Live restaurant listings" : "Preview restaurants"}
       </p>
-      <p
-        className={`mt-0.5 leading-relaxed opacity-90 ${compact ? "text-[11px]" : ""}`}
-      >
-        {isLive ? LIVE_ATTRIBUTION : DEMO_ATTRIBUTION}
-        {!isLive &&
-          " Live Google Places appears only when a server API key is configured — never mixed with demo listings."}
+      <p className={`mt-0.5 leading-relaxed ${compact ? "text-[11px]" : ""}`}>
+        {isLive
+          ? "Venue details come from Google Places. Always confirm allergens directly with the restaurant."
+          : "You're exploring FoodToura with sample restaurants for Barcelona & Lisbon. Live city-wide search unlocks when a Google Places key is added on the server — never mixed with these previews."}
       </p>
     </div>
   );

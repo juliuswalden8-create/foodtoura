@@ -158,7 +158,7 @@ export default function ResultsPage() {
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-12">
       <div className="mb-6 max-w-2xl animate-fade-up">
-        <p className="text-sm font-medium text-terracotta">Your matches</p>
+        <p className="text-sm font-medium text-terracotta">For you tonight</p>
         <h1 className="mt-1 font-display text-3xl font-semibold text-forest dark:text-cream sm:text-4xl">
           Restaurants for {state.location.city || "your destination"}
         </h1>
@@ -169,12 +169,12 @@ export default function ResultsPage() {
             : ""}
         </p>
         <p className="mt-1 text-xs text-ink-muted">
-          Match % is preference fit only — never allergy safety. Distances are
-          straight-line, not walking ETA.
+          How well a place fits your taste is separate from allergy safety —
+          always double-check with the restaurant. Distances are approximate.
         </p>
         <div className="mt-4 flex flex-wrap items-center gap-3">
           <Link href="/guide" className="btn-secondary !py-2.5 text-xs">
-            Edit AI params
+            Ask your guide
           </Link>
           <Link href="/discover" className="btn-secondary !py-2.5 text-xs">
             Wizard
