@@ -44,7 +44,8 @@ export default {
       },
       boxShadow: {
         soft: "0 8px 30px rgba(52, 78, 65, 0.08)",
-        card: "0 4px 24px rgba(52, 78, 65, 0.06)",
+        // Named "lift" — "card" conflicts with color `card` and becomes a white shadow
+        lift: "0 4px 24px rgba(52, 78, 65, 0.06)",
       },
       keyframes: {
         "fade-up": {

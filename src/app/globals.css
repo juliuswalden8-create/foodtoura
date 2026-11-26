@@ -85,7 +85,7 @@ body {
   }
 
   .card-surface {
-    @apply rounded-3xl border border-[#E8DFD0] bg-[#FFFDF9] shadow-card;
+    @apply rounded-3xl border border-[#E8DFD0] bg-[#FFFDF9] shadow-lift;
   }
 
   .msg-user {
@@ -93,6 +93,6 @@ body {
   }
 
   .msg-assistant {
-    @apply mr-auto max-w-[90%] rounded-3xl rounded-bl-lg border border-[#E8DFD0] bg-[#FFFDF9] px-4 py-3 text-sm leading-relaxed text-[#303A32] shadow-card;
+    @apply mr-auto max-w-[90%] rounded-3xl rounded-bl-lg border border-[#E8DFD0] bg-[#FFFDF9] px-4 py-3 text-sm leading-relaxed text-[#303A32] shadow-lift;
   }
 }

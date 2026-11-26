@@ -136,7 +136,7 @@ export function SwipeResults({ results }: { results: RankedRestaurant[] }) {
       <div className="mt-4 flex items-center justify-center gap-4">
         <button
           type="button"
-          className="flex h-14 w-14 items-center justify-center rounded-full border border-mist bg-white text-lg font-semibold text-ink-muted shadow-card"
+          className="flex h-14 w-14 items-center justify-center rounded-full border border-mist bg-white text-lg font-semibold text-ink-muted shadow-lift"
           onClick={next}
           aria-label="Skip"
         >

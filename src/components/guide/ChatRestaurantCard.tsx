@@ -27,7 +27,7 @@ export function ChatRestaurantCard({
     "A warm fit for what you described.";
 
   return (
-    <article className="overflow-hidden rounded-3xl border border-mist bg-card shadow-card">
+    <article className="overflow-hidden rounded-3xl border border-mist bg-card shadow-lift">
       <div className="relative aspect-[16/10]">
         <Image
           src={restaurant.imageUrl}

@@ -395,7 +395,7 @@ function GuideInner() {
                 <button
                   key={s}
                   type="button"
-                  className="chip chip-idle max-w-full text-left text-xs"
+                  className="chip chip-idle max-w-full text-left text-xs !text-[#344E41]"
                   onClick={() => void send(s)}
                 >
                   {s}
@@ -437,7 +437,7 @@ function GuideInner() {
                   <button
                     key={s}
                     type="button"
-                    className="chip chip-idle text-xs"
+                    className="chip chip-idle text-xs !text-[#344E41]"
                     onClick={() => void send(s)}
                   >
                     {s}
