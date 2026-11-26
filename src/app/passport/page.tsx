@@ -21,16 +21,19 @@ const DIETS: DietaryPreference[] = [
   "Lactose intolerance",
 ];
 
+const EMPTY_PASSPORT = (): AllergyPassport => ({
+  travelerName: "",
+  language: "es",
+  allergens: [],
+  dietary: [],
+  customNote: "",
+  emergencyNote: "",
+  updatedAt: new Date().toISOString(),
+});
+
 export default function PassportPage() {
-  const [passport, setPassport] = useState<AllergyPassport>({
-    travelerName: "",
-    language: "es",
-    allergens: [],
-    dietary: [],
-    customNote: "",
-    emergencyNote: "",
-    updatedAt: new Date().toISOString(),
-  });
+  const [passport, setPassport] = useState<AllergyPassport>(EMPTY_PASSPORT);
+  const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
     try {
@@ -39,14 +42,16 @@ export default function PassportPage() {
     } catch {
       /* ignore */
     }
+    setHydrated(true);
   }, []);
 
   useEffect(() => {
+    if (!hydrated) return;
     localStorage.setItem(
       PASSPORT_STORAGE_KEY,
       JSON.stringify({ ...passport, updatedAt: new Date().toISOString() }),
     );
-  }, [passport]);
+  }, [passport, hydrated]);
 
   const lines = useMemo(() => formatPassportLines(passport), [passport]);
   const phrases = passportPhrases(passport.language);

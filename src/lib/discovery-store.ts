@@ -1,8 +1,27 @@
-import type { DiscoveryState } from "./types";
+import type { DiscoveryState, Restaurant } from "./types";
 
 export const DISCOVERY_STORAGE_KEY = "foodtoura.discovery.v2";
 export const SAVED_STORAGE_KEY = "foodtoura.saved.v1";
+export const SAVED_SNAPSHOTS_KEY = "foodtoura.saved.snapshots.v1";
 export const DESTINATION_KEY = "foodtoura.destination.v1";
+
+export type SavedSnapshot = Pick<
+  Restaurant,
+  | "id"
+  | "name"
+  | "city"
+  | "country"
+  | "cuisine"
+  | "imageUrl"
+  | "rating"
+  | "priceLevel"
+  | "neighborhood"
+  | "lat"
+  | "lng"
+  | "phone"
+  | "website"
+  | "address"
+>;
 
 export const defaultDiscoveryState = (): DiscoveryState => ({
   location: {
@@ -90,9 +109,49 @@ export function loadSavedIds(): string[] {
   }
 }
 
-export function toggleSaved(id: string): string[] {
+export function loadSavedSnapshots(): SavedSnapshot[] {
+  if (typeof window === "undefined") return [];
+  try {
+    return JSON.parse(localStorage.getItem(SAVED_SNAPSHOTS_KEY) || "[]");
+  } catch {
+    return [];
+  }
+}
+
+function saveSnapshots(list: SavedSnapshot[]) {
+  localStorage.setItem(SAVED_SNAPSHOTS_KEY, JSON.stringify(list));
+}
+
+export function toggleSaved(
+  id: string,
+  snapshot?: Partial<Restaurant> | null,
+): string[] {
   const ids = loadSavedIds();
-  const next = ids.includes(id) ? ids.filter((x) => x !== id) : [...ids, id];
+  const removing = ids.includes(id);
+  const next = removing ? ids.filter((x) => x !== id) : [...ids, id];
   localStorage.setItem(SAVED_STORAGE_KEY, JSON.stringify(next));
+
+  const snaps = loadSavedSnapshots().filter((s) => s.id !== id);
+  if (!removing && snapshot) {
+    snaps.unshift({
+      id,
+      name: snapshot.name || id,
+      city: snapshot.city || "",
+      country: snapshot.country || "",
+      cuisine: snapshot.cuisine || [],
+      imageUrl:
+        snapshot.imageUrl ||
+        "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&q=80",
+      rating: snapshot.rating ?? 0,
+      priceLevel: snapshot.priceLevel ?? 2,
+      neighborhood: snapshot.neighborhood || "",
+      lat: snapshot.lat ?? 0,
+      lng: snapshot.lng ?? 0,
+      phone: snapshot.phone || "",
+      website: snapshot.website,
+      address: snapshot.address || "",
+    });
+  }
+  saveSnapshots(snaps.slice(0, 80));
   return next;
 }

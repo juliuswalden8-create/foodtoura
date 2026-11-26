@@ -49,11 +49,33 @@ export function LocationSearch() {
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         setLocating(false);
-        // Demo: map unknown GPS to nearest demo city (Barcelona / Lisbon region heuristic)
         const { latitude, longitude } = pos.coords;
         const nearLisbon =
-          Math.abs(latitude - 38.72) < 2 && Math.abs(longitude + 9.14) < 2;
-        const detected = nearLisbon ? "Lisbon" : "Barcelona";
+          Math.abs(latitude - 38.72) < 1.2 && Math.abs(longitude + 9.14) < 1.2;
+        const nearBarcelona =
+          Math.abs(latitude - 41.39) < 1.2 && Math.abs(longitude - 2.17) < 1.2;
+        const nearMadrid =
+          Math.abs(latitude - 40.42) < 1.2 && Math.abs(longitude + 3.7) < 1.2;
+        const nearMarbella =
+          Math.abs(latitude - 36.51) < 0.8 && Math.abs(longitude + 4.88) < 0.8;
+
+        let detected: string | null = null;
+        if (nearLisbon) detected = "Lisbon";
+        else if (nearBarcelona) detected = "Barcelona";
+        else if (nearMadrid) detected = "Madrid";
+        else if (nearMarbella) detected = "Marbella";
+
+        if (!detected) {
+          setError(
+            "We have your coordinates, but couldn't name the city automatically. Enter your city below — we won't assume Barcelona.",
+          );
+          const state = defaultDiscoveryState();
+          state.location.useCurrentLocation = true;
+          state.location.lat = latitude;
+          state.location.lng = longitude;
+          saveDiscoveryState(state);
+          return;
+        }
         setCity(detected);
         startWithCity(detected, { lat: latitude, lng: longitude });
       },

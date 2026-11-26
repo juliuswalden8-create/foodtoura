@@ -11,9 +11,10 @@ import {
   loadDiscoveryState,
   saveDiscoveryState,
 } from "@/lib/discovery-store";
+import { fetchDiscover } from "@/lib/discover-client";
 import { parsePreferences } from "@/lib/preference-parser";
-import { searchRestaurantsForState } from "@/lib/provider";
 import { describeNoFullMatch, rankRestaurants } from "@/lib/ranking";
+import { loadTaste } from "@/lib/taste-profile";
 import type { RankedRestaurant } from "@/lib/types";
 
 export default function RecommendPage() {
@@ -25,6 +26,8 @@ export default function RecommendPage() {
   const [results, setResults] = useState<RankedRestaurant[]>([]);
   const [hint, setHint] = useState<string | null>(null);
   const [attribution, setAttribution] = useState("");
+  const [dataMode, setDataMode] = useState<"demo" | "live">("demo");
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const s = loadDiscoveryState();
@@ -34,6 +37,7 @@ export default function RecommendPage() {
   async function generate() {
     setLoading(true);
     setHint(null);
+    setError(null);
     try {
       const parsed = await parsePreferences(prompt);
       const state = defaultDiscoveryState();
@@ -45,6 +49,7 @@ export default function RecommendPage() {
           parsed.country ||
           existing.location.country ||
           (parsed.city === "Lisbon" ? "Portugal" : "Spain"),
+        maxDistanceKm: parsed.maxDistanceKm ?? existing.location.maxDistanceKm,
       };
       state.food = {
         ...state.food,
@@ -53,19 +58,25 @@ export default function RecommendPage() {
         outdoorSeating: parsed.outdoorSeating,
         livelyAtmosphere: parsed.livelyAtmosphere === true ? true : false,
         maxBudgetPerPerson: parsed.maxBudgetPerPerson,
+        atmosphere: parsed.atmosphere,
         parsedNotes: parsed.notes,
       };
       state.allergens = parsed.allergens;
       state.dietary = parsed.dietary;
       if (parsed.partySize) state.guests.adults = parsed.partySize;
+      if (parsed.children != null) state.guests.children = parsed.children;
       saveDiscoveryState(state);
       setNotes(parsed.notes);
 
-      const provider = await searchRestaurantsForState(state);
+      const provider = await fetchDiscover(state);
       setAttribution(provider.attribution);
-      const ranked = rankRestaurants(provider.restaurants, state);
+      setDataMode(provider.mode);
+      const ranked = rankRestaurants(provider.restaurants, state, loadTaste());
       setResults(ranked.slice(0, 6));
       setHint(describeNoFullMatch(ranked));
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Recommendation failed");
+      setResults([]);
     } finally {
       setLoading(false);
     }
@@ -83,8 +94,13 @@ export default function RecommendPage() {
       </p>
 
       <div className="mt-5 max-w-2xl space-y-3">
-        <DemoModeBanner compact />
+        <DemoModeBanner compact mode={dataMode} />
         <SafetyBanner compact />
+        {error && (
+          <p className="rounded-2xl bg-red-50 px-3 py-2 text-sm text-red-800 dark:bg-red-950/40 dark:text-red-100">
+            {error}
+          </p>
+        )}
       </div>
 
       <div className="card-surface mt-6 max-w-2xl space-y-3 p-5">

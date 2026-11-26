@@ -130,7 +130,9 @@ export function RestaurantCard({
           <button
             type="button"
             className={`chip text-xs ${saved ? "chip-active" : "chip-idle"}`}
-            onClick={() => setSaved(toggleSaved(restaurant.id).includes(restaurant.id))}
+            onClick={() =>
+              setSaved(toggleSaved(restaurant.id, restaurant).includes(restaurant.id))
+            }
           >
             {saved ? "Saved" : "Save"}
           </button>

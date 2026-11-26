@@ -12,11 +12,11 @@ import {
   SwipeResults,
   ViewModeToggle,
 } from "@/components/results/ResultsViews";
+import { fetchDiscover } from "@/lib/discover-client";
 import {
   loadDiscoveryState,
   saveDiscoveryState,
 } from "@/lib/discovery-store";
-import { searchRestaurantsForState } from "@/lib/provider";
 import { describeNoFullMatch, rankRestaurants } from "@/lib/ranking";
 import { tripShareUrl } from "@/lib/share-trip";
 import { loadTaste } from "@/lib/taste-profile";
@@ -62,6 +62,7 @@ export default function ResultsPage() {
   const [mode, setMode] = useState<ResultsViewMode>("list");
   const [sort, setSort] = useState<ResultsSort>("best");
   const [attribution, setAttribution] = useState("");
+  const [dataMode, setDataMode] = useState<"demo" | "live">("demo");
   const [shareUrl, setShareUrl] = useState("");
   const [copied, setCopied] = useState(false);
   const restoredScroll = useRef(false);
@@ -71,14 +72,14 @@ export default function ResultsPage() {
     setState(loaded);
     setShareUrl(tripShareUrl(loaded));
 
-    let cancelled = false;
+    const ac = new AbortController();
     (async () => {
       try {
         setLoading(true);
         setError(null);
-        const providerResult = await searchRestaurantsForState(loaded);
-        if (cancelled) return;
+        const providerResult = await fetchDiscover(loaded, ac.signal);
         setAttribution(providerResult.attribution);
+        setDataMode(providerResult.mode);
         setRaw(providerResult.restaurants);
         if (providerResult.restaurants.length === 0) {
           setError(
@@ -88,7 +89,7 @@ export default function ResultsPage() {
           );
         }
       } catch (e) {
-        if (cancelled) return;
+        if (ac.signal.aborted) return;
         setError(
           e instanceof Error
             ? e.message
@@ -96,13 +97,11 @@ export default function ResultsPage() {
         );
         setRaw([]);
       } finally {
-        if (!cancelled) setLoading(false);
+        if (!ac.signal.aborted) setLoading(false);
       }
     })();
 
-    return () => {
-      cancelled = true;
-    };
+    return () => ac.abort();
   }, []);
 
   const results = useMemo(() => {
@@ -202,7 +201,7 @@ export default function ResultsPage() {
       </div>
 
       <div className="mb-4 space-y-3">
-        <DemoModeBanner compact />
+        <DemoModeBanner compact mode={dataMode} />
         <SafetyBanner />
         <PreferenceChips state={state} onChange={updateState} />
         <div className="flex flex-wrap gap-2">
