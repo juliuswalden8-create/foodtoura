@@ -2,13 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Light-only design system — dark mode disabled until fully designed */
+/* Light-only design tokens — flagship client system */
 :root {
   --cream: #faf7f0;
   --sand: #f1ece3;
   --card: #fffdf9;
   --forest: #344e41;
-  --forest-mid: #879b7c;
+  --sage: #a7b69a;
+  --forest-mid: #a7b69a;
   --terracotta: #c9856b;
   --terracotta-deep: #a86b52;
   --ink: #303a32;
@@ -16,6 +17,16 @@
   --ink-muted: #7a7f76;
   --border: #e8dfd0;
   --bg: #faf7f0;
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --radius-chip: 9999px;
+  --radius-card: 1.5rem;
+  --shadow-soft: 0 8px 30px rgba(52, 78, 65, 0.08);
+  --shadow-lift: 0 4px 24px rgba(52, 78, 65, 0.06);
 }
 
 html {
@@ -32,6 +43,19 @@ body {
   background: #faf7f0 !important;
   color: #303a32 !important;
   min-height: 100dvh;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 ::selection {
@@ -61,7 +85,7 @@ body {
 
 @layer components {
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-full bg-[#C9856B] px-6 py-3.5 text-sm font-semibold text-white shadow-soft transition hover:bg-[#A86B52] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C9856B] disabled:cursor-not-allowed disabled:opacity-50;
+    @apply inline-flex items-center justify-center gap-2 rounded-full bg-[#A86B52] px-6 py-3.5 text-sm font-semibold text-white shadow-soft transition hover:bg-[#8F5743] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#A86B52] disabled:cursor-not-allowed disabled:opacity-50;
   }
 
   .btn-secondary {
@@ -86,6 +110,22 @@ body {
 
   .card-surface {
     @apply rounded-3xl border border-[#E8DFD0] bg-[#FFFDF9] shadow-lift;
+  }
+
+  input[type="range"] {
+    @apply h-2 w-full cursor-pointer appearance-none rounded-full bg-[#E8DFD0];
+  }
+
+  input[type="range"]::-webkit-slider-thumb {
+    @apply h-5 w-5 appearance-none rounded-full border-0 bg-[#344E41];
+  }
+
+  input[type="range"]::-moz-range-thumb {
+    @apply h-5 w-5 rounded-full border-0 bg-[#344E41];
+  }
+
+  input[type="range"]::-moz-range-track {
+    @apply h-2 rounded-full bg-[#E8DFD0];
   }
 
   .msg-user {

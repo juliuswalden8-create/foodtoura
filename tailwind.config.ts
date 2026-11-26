@@ -16,10 +16,11 @@ export default {
         card: "#FFFDF9",
         forest: {
           DEFAULT: "#344E41",
-          mid: "#879B7C",
+          mid: "#A7B69A",
           soft: "#4A6354",
           muted: "#5C7364",
         },
+        sage: "#A7B69A",
         terracotta: {
           DEFAULT: "#C9856B",
           soft: "#D4A08C",

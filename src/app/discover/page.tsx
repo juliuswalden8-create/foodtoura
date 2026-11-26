@@ -58,11 +58,21 @@ export default function DiscoverPage() {
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-8 sm:px-6 sm:py-12">
-      <WizardProgress step={step} />
+      <p className="text-sm font-medium text-[#C9856B]">Perfect Match</p>
+      <h1 className="mt-1 font-display text-3xl font-semibold text-[#344E41]">
+        A few friendly questions
+      </h1>
+      <p className="mt-2 text-sm text-[#62675E]">
+        Who&apos;s joining, what sounds delicious, the mood and anything we must
+        respect — then review before we search.
+      </p>
+      <div className="mt-6">
+        <WizardProgress step={step} />
+      </div>
 
       <div
         key={`${step}-${direction}`}
-        className="card-surface p-5 sm:p-8"
+        className="card-surface mt-4 p-5 sm:p-8"
       >
         {step === 1 && (
           <StepLocation

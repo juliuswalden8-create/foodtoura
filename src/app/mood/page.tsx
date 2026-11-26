@@ -1,12 +1,14 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { Suspense, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { DemoModeBanner } from "@/components/DemoModeBanner";
 import { loadDiscoveryState, saveDiscoveryState } from "@/lib/discovery-store";
 import { applyMood, MOODS, type MoodId } from "@/lib/mood";
 
-export default function MoodPage() {
+function MoodInner() {
   const router = useRouter();
+  const params = useSearchParams();
 
   function pick(id: MoodId) {
     const next = applyMood(id, loadDiscoveryState());
@@ -17,6 +19,19 @@ export default function MoodPage() {
     saveDiscoveryState(next);
     router.push("/discover/results");
   }
+
+  useEffect(() => {
+    const raw = params.get("mood");
+    if (!raw) return;
+    const alias: Record<string, MoodId> = {
+      outdoor: "outdoor",
+      romantic: "romantic",
+      family: "family",
+    };
+    const id = alias[raw] || (MOODS.find((m) => m.id === raw)?.id as MoodId | undefined);
+    if (id) pick(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [params]);
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-8 sm:px-6 sm:py-12">
@@ -48,5 +63,19 @@ export default function MoodPage() {
         ))}
       </ul>
     </div>
+  );
+}
+
+export default function MoodPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="mx-auto max-w-2xl px-4 py-16">
+          <div className="skeleton h-40 w-full" />
+        </div>
+      }
+    >
+      <MoodInner />
+    </Suspense>
   );
 }

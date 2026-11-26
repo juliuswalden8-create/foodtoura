@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" fill="none">
+  <rect width="1200" height="630" fill="#FAF7F0"/>
+  <rect x="0" y="0" width="1200" height="630" fill="url(#g)" opacity="0.9"/>
+  <defs>
+    <radialGradient id="g" cx="20%" cy="0%" r="70%">
+      <stop offset="0%" stop-color="#C9856B" stop-opacity="0.18"/>
+      <stop offset="55%" stop-color="#A7B69A" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="#FAF7F0" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <circle cx="980" cy="315" r="180" fill="#344E41"/>
+  <ellipse cx="980" cy="345" rx="110" ry="38" fill="#FFFDF9"/>
+  <path d="M870 280c30-60 75-90 110-90s80 30 110 90" stroke="#A7B69A" stroke-width="14" stroke-linecap="round" fill="none"/>
+  <circle cx="980" cy="340" r="16" fill="#C9856B"/>
+  <text x="80" y="250" font-family="Georgia, serif" font-size="72" fill="#344E41" font-weight="600">FoodToura</text>
+  <text x="80" y="330" font-family="Georgia, serif" font-size="40" fill="#303A32">Good food makes anywhere feel like home.</text>
+  <text x="80" y="400" font-family="system-ui, sans-serif" font-size="24" fill="#62675E">Restaurant discovery for travelers — taste, people &amp; place.</text>
+</svg>
