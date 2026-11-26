@@ -1,33 +1,43 @@
 import { NextResponse } from "next/server";
-import { RESTAURANTS } from "@/lib/mock-restaurants";
-import { rankRestaurants } from "@/lib/ranking";
-import type { DiscoveryState } from "@/lib/types";
 import { defaultDiscoveryState } from "@/lib/discovery-store";
+import { getDataMode, searchRestaurantsForState } from "@/lib/provider";
+import { describeNoFullMatch, rankRestaurants } from "@/lib/ranking";
+import type { DiscoveryState } from "@/lib/types";
 
 /**
- * Ranking endpoint — mock restaurants today.
- * Extension: replace RESTAURANTS with Google Places / partner inventory.
+ * Ranking endpoint.
+ * Demo vs live is decided by provider — never mixed in one payload.
  */
 export async function POST(request: Request) {
   try {
     const body = (await request.json()) as Partial<DiscoveryState>;
+    const base = defaultDiscoveryState();
     const state: DiscoveryState = {
-      ...defaultDiscoveryState(),
+      ...base,
       ...body,
-      location: { ...defaultDiscoveryState().location, ...body.location },
-      guests: { ...defaultDiscoveryState().guests, ...body.guests },
-      food: { ...defaultDiscoveryState().food, ...body.food },
+      location: { ...base.location, ...body.location },
+      guests: { ...base.guests, ...body.guests },
+      food: { ...base.food, ...body.food },
+      mandatory: { ...base.mandatory, ...body.mandatory },
     };
-    const results = rankRestaurants(RESTAURANTS, state);
+
+    const providerResult = await searchRestaurantsForState(state);
+    const results = rankRestaurants(providerResult.restaurants, state);
+
     return NextResponse.json({
+      mode: providerResult.mode,
+      attribution: providerResult.attribution,
       results,
+      noFullMatchHint: describeNoFullMatch(results),
       meta: {
-        source: "mock",
+        dataMode: getDataMode(),
         cities: ["Barcelona", "Lisbon"],
         count: results.length,
+        cachedAt: providerResult.cachedAt,
       },
     });
-  } catch {
-    return NextResponse.json({ error: "Invalid request." }, { status: 400 });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Invalid request.";
+    return NextResponse.json({ error: message }, { status: 400 });
   }
 }

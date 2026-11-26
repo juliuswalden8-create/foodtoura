@@ -1,6 +1,7 @@
 import type { Config } from "tailwindcss";
 
 export default {
+  darkMode: "class",
   content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
@@ -12,6 +13,7 @@ export default {
         cream: "#FAF8F3",
         forest: {
           DEFAULT: "#173F35",
+          mid: "#397B60",
           soft: "#2A5A4C",
           muted: "#3D6B5C",
         },
@@ -20,10 +22,15 @@ export default {
           soft: "#F09474",
           deep: "#C45E38",
         },
+        ink: {
+          DEFAULT: "#202522",
+          soft: "#3A403C",
+          muted: "#6B736E",
+        },
         charcoal: {
-          DEFAULT: "#1C1C1A",
-          soft: "#3D3D38",
-          muted: "#6B6B63",
+          DEFAULT: "#202522",
+          soft: "#3A403C",
+          muted: "#6B736E",
         },
         sand: "#EFEAE0",
         mist: "#E8E4DB",
@@ -49,16 +56,16 @@ export default {
           "0%": { backgroundPosition: "-200% 0" },
           "100%": { backgroundPosition: "200% 0" },
         },
-        pulseSoft: {
-          "0%, 100%": { opacity: "1" },
-          "50%": { opacity: "0.55" },
+        swipeHint: {
+          "0%, 100%": { transform: "translateX(0)" },
+          "50%": { transform: "translateX(6px)" },
         },
       },
       animation: {
         "fade-up": "fade-up 0.45s ease-out both",
         "fade-in": "fade-in 0.35s ease-out both",
         shimmer: "shimmer 1.4s linear infinite",
-        "pulse-soft": "pulseSoft 1.5s ease-in-out infinite",
+        "swipe-hint": "swipeHint 1.6s ease-in-out infinite",
       },
     },
   },

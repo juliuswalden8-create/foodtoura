@@ -153,7 +153,23 @@ export function parsePreferencesSync(text: string): ParsedPreferences {
   }
   if (cuisines.length) notes.push(`Cuisines: ${cuisines.join(", ")}`);
 
+  const accessibilityNeeds = /wheelchair|accessib|step[- ]free|mobility/i.test(
+    text,
+  )
+    ? true
+    : undefined;
+
+  const country =
+    city === "Barcelona" || city === "Madrid"
+      ? "Spain"
+      : city === "Lisbon"
+        ? "Portugal"
+        : city === "Paris"
+          ? "France"
+          : undefined;
+
   return {
+    country,
     city,
     cuisines,
     outdoorSeating,
@@ -162,6 +178,7 @@ export function parsePreferencesSync(text: string): ParsedPreferences {
     partySize,
     allergens,
     dietary,
+    accessibilityNeeds,
     notes,
   };
 }

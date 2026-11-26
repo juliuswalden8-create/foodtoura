@@ -37,10 +37,9 @@ function evaluateAllergy(
 ): {
   safetyLevel: RankedRestaurant["safetyLevel"];
   warnings: string[];
-  penalty: number;
+  hardFail: boolean;
 } {
   const warnings: string[] = [];
-  let penalty = 0;
   let hasConflict = false;
   let hasUnknown = false;
   let hasCaution = false;
@@ -56,7 +55,6 @@ function evaluateAllergy(
       warnings.push(
         `${label}: information unavailable — verify directly with the restaurant.`,
       );
-      penalty += isMedical ? 35 : 18;
       continue;
     }
 
@@ -66,13 +64,11 @@ function evaluateAllergy(
         warnings.push(
           `${label}: restaurant reports this allergen as present. Not recommended for a medical allergy.`,
         );
-        penalty += 100;
       } else {
         hasCaution = true;
         warnings.push(
           `${label}: present according to restaurant data — may not suit your intolerance.`,
         );
-        penalty += 40;
       }
       continue;
     }
@@ -82,7 +78,6 @@ function evaluateAllergy(
       warnings.push(
         `${label}: marked absent but unverified — confirm with the restaurant.`,
       );
-      penalty += isMedical ? 25 : 10;
     }
   }
 
@@ -91,9 +86,15 @@ function evaluateAllergy(
   else if (hasUnknown) safetyLevel = "unknown";
   else if (hasCaution) safetyLevel = "caution";
 
-  return { safetyLevel, warnings, penalty };
+  return { safetyLevel, warnings, hardFail: hasConflict };
 }
 
+/**
+ * Explainable ranking.
+ * - Mandatory filters are deterministic (city, medical allergy conflicts when mandatory.allergens).
+ * - Match % is preference fit only — NEVER implies allergy safety.
+ * - Match % is null when data is too incomplete / unreliable.
+ */
 export function rankRestaurants(
   restaurants: Restaurant[],
   state: DiscoveryState,
@@ -110,122 +111,250 @@ export function rankRestaurants(
     (c) => c !== "Surprise me",
   );
   const cuisineSet = new Set<string>(preferredCuisines);
+  const mandatory = state.mandatory ?? {
+    city: true,
+    allergens: true,
+    dietary: false,
+    budget: false,
+    cuisine: false,
+  };
 
   const ranked: RankedRestaurant[] = restaurants
     .filter((r) => {
-      if (!state.location.city) return true;
-      return r.city.toLowerCase() === state.location.city.toLowerCase();
+      if (mandatory.city && state.location.city) {
+        if (r.city.toLowerCase() !== state.location.city.toLowerCase()) {
+          return false;
+        }
+      }
+      return true;
     })
     .map((r) => {
-      let score = 55;
-      const reasons: string[] = [];
-      const distanceKm = haversineKm(center.lat, center.lng, r.lat, r.lng);
+      const scoreExplain: string[] = [];
+      const missingDataFlags: string[] = [];
+      const matchReasons: string[] = [];
+      let softScore = 50;
+      let hardExcluded = false;
+      let conflictExplanation: string | undefined;
 
-      if (state.location.neighborhood) {
-        if (
-          r.neighborhood
-            .toLowerCase()
-            .includes(state.location.neighborhood.toLowerCase())
-        ) {
-          score += 12;
-          reasons.push(`In ${r.neighborhood}`);
+      const distanceKm = haversineKm(center.lat, center.lng, r.lat, r.lng);
+      const allergy = evaluateAllergy(r, state.allergens);
+
+      // Allergen safety is NEVER folded into match %
+      if (allergy.hardFail && mandatory.allergens) {
+        hardExcluded = true;
+        conflictExplanation =
+          "Medical allergy conflict — restaurant reports a listed allergen as present. Safety filters cannot be relaxed; choose another venue or verify a chef-led safe path directly.";
+      }
+
+      if (r.dataCompleteness < 0.55) {
+        missingDataFlags.push("Incomplete allergen or venue metadata");
+      }
+      if (r.reviewReliability === "low") {
+        missingDataFlags.push("Limited review reliability");
+      }
+      const unavailableAllergens = r.allergens.filter(
+        (a) => a.source === "unavailable",
+      ).length;
+      if (unavailableAllergens > 6) {
+        missingDataFlags.push("Many allergen fields unavailable");
+      }
+
+      // Distance
+      if (distanceKm <= state.location.maxDistanceKm) {
+        softScore += Math.max(0, 14 - distanceKm * 1.4);
+        matchReasons.push(`${distanceKm.toFixed(1)} km away`);
+        scoreExplain.push(`Within ${state.location.maxDistanceKm} km (+)`);
+      } else {
+        softScore -= 16;
+        scoreExplain.push(`Outside max distance (−)`);
+        if (mandatory.city) {
+          // soft — distance not mandatory unless we add it
         }
       }
 
-      if (distanceKm <= state.location.maxDistanceKm) {
-        score += Math.max(0, 15 - distanceKm * 1.5);
-        reasons.push(`${distanceKm.toFixed(1)} km away`);
-      } else {
-        score -= 20;
+      // Neighborhood
+      if (
+        state.location.neighborhood &&
+        r.neighborhood
+          .toLowerCase()
+          .includes(state.location.neighborhood.toLowerCase())
+      ) {
+        softScore += 10;
+        matchReasons.push(`In ${r.neighborhood}`);
+        scoreExplain.push("Neighborhood match (+)");
       }
 
+      // Cuisine
       if (cuisineSet.size > 0) {
         const overlap = r.cuisine.filter((c) => cuisineSet.has(c));
         if (overlap.length) {
-          score += overlap.length * 10;
-          reasons.push(`Matches ${overlap.join(", ")}`);
+          softScore += overlap.length * 9;
+          matchReasons.push(`Matches ${overlap.join(", ")}`);
+          scoreExplain.push(`Cuisine overlap: ${overlap.join(", ")} (+)`);
         } else if (!wantsSurprise) {
-          score -= 15;
+          softScore -= 14;
+          scoreExplain.push("No cuisine overlap (−)");
+          if (mandatory.cuisine) {
+            hardExcluded = true;
+            conflictExplanation =
+              conflictExplanation ??
+              "No cuisine overlap with your mandatory cuisine filters.";
+          }
         }
       } else if (wantsSurprise) {
-        score += 5;
-        reasons.push("Surprise-friendly pick");
+        softScore += 4;
+        matchReasons.push("Surprise-friendly pick");
       }
 
+      // Atmosphere / seating
       if (state.food.outdoorSeating && r.outdoorSeating) {
-        score += 8;
-        reasons.push("Outdoor seating");
+        softScore += 8;
+        matchReasons.push("Outdoor seating");
+        scoreExplain.push("Outdoor seating (+)");
+      } else if (state.food.outdoorSeating && !r.outdoorSeating) {
+        softScore -= 6;
+        scoreExplain.push("No outdoor seating (−)");
       }
       if (state.food.livelyAtmosphere && r.livelyAtmosphere) {
-        score += 6;
-        reasons.push("Lively atmosphere");
+        softScore += 6;
+        matchReasons.push("Lively atmosphere");
+        scoreExplain.push("Lively atmosphere (+)");
       }
-      if (state.food.livelyAtmosphere === false && r.quietAtmosphere) {
-        score += 4;
+      if (state.food.wheelchairAccessible || state.food.accessibilityNeeds) {
+        if (r.wheelchairAccessible) {
+          softScore += 8;
+          matchReasons.push("Wheelchair accessible");
+          scoreExplain.push("Accessibility (+)");
+        } else {
+          softScore -= 20;
+          scoreExplain.push("Accessibility not confirmed (−)");
+          missingDataFlags.push("Accessibility not confirmed");
+        }
       }
 
+      // Budget
       if (state.food.maxBudgetPerPerson != null) {
         if (r.avgPricePerPerson <= state.food.maxBudgetPerPerson) {
-          score += 10;
-          reasons.push(`Within €${state.food.maxBudgetPerPerson} budget`);
+          softScore += 10;
+          matchReasons.push(`Within €${state.food.maxBudgetPerPerson} budget`);
+          scoreExplain.push("Within per-person budget (+)");
         } else {
-          score -= 18;
+          softScore -= 16;
+          scoreExplain.push("Over per-person budget (−)");
+          if (mandatory.budget) {
+            hardExcluded = true;
+            conflictExplanation =
+              conflictExplanation ??
+              `Average €${r.avgPricePerPerson}/person exceeds your mandatory €${state.food.maxBudgetPerPerson} budget. Relax budget to include this venue.`;
+          }
         }
       }
 
+      // Dietary (preference — not allergy safety)
       for (const diet of state.dietary) {
         if (r.dietarySupported.includes(diet)) {
-          score += 8;
-          reasons.push(`Supports ${diet}`);
+          softScore += 7;
+          matchReasons.push(`Supports ${diet}`);
+          scoreExplain.push(`Diet: ${diet} (+)`);
         } else {
-          score -= 12;
+          softScore -= 10;
+          scoreExplain.push(`Diet: ${diet} not listed (−)`);
+          if (mandatory.dietary) {
+            hardExcluded = true;
+            conflictExplanation =
+              conflictExplanation ??
+              `Does not list support for mandatory diet: ${diet}.`;
+          }
         }
       }
 
+      // Group / kids
       if (partySize >= 6) {
         if (r.acceptsLargeGroups) {
-          score += 10;
-          reasons.push("Welcomes large groups");
+          softScore += 10;
+          matchReasons.push("Welcomes large groups");
+          scoreExplain.push("Large group fit (+)");
         } else {
-          score -= 25;
+          softScore -= 22;
+          scoreExplain.push("Large groups not supported (−)");
         }
       }
-
       if (state.guests.children > 0 || state.guests.infants > 0) {
         if (r.childFriendly) {
-          score += 6;
-          reasons.push("Child-friendly");
-        } else {
-          score -= 10;
-        }
+          softScore += 6;
+          matchReasons.push("Child-friendly");
+        } else softScore -= 8;
       }
 
-      score += Math.min(8, (r.rating - 4) * 8);
+      // Ratings & reliability (capped — never a safety signal)
+      softScore += Math.min(6, (r.rating - 4) * 6);
+      if (r.reviewReliability === "high") softScore += 3;
+      if (r.reviewReliability === "low") softScore -= 4;
+      softScore += Math.round(r.dataCompleteness * 6);
+      scoreExplain.push(
+        `Rating ${r.rating} · reviews ${r.reviewReliability} · data ${Math.round(r.dataCompleteness * 100)}%`,
+      );
 
-      const allergy = evaluateAllergy(r, state.allergens);
-      score -= allergy.penalty;
-      if (allergy.safetyLevel === "compatible" && state.allergens.some((a) => a.severity !== "preference")) {
-        reasons.push("No reported conflicts with your allergens");
+      if (
+        allergy.safetyLevel === "compatible" &&
+        state.allergens.some((a) => a.severity !== "preference")
+      ) {
+        matchReasons.push("No reported allergen conflicts (still verify)");
+      }
+
+      const enoughData =
+        r.dataCompleteness >= 0.45 && r.reviewReliability !== "low";
+      const matchScore = enoughData
+        ? Math.max(0, Math.min(99, Math.round(softScore)))
+        : null;
+      if (matchScore == null) {
+        missingDataFlags.push(
+          "Match % hidden — not enough reliable data to score fairly",
+        );
       }
 
       return {
         ...r,
-        matchScore: Math.max(0, Math.min(99, Math.round(score))),
-        matchReasons: reasons.slice(0, 4),
+        matchScore,
+        matchReasons: matchReasons.slice(0, 5),
         allergyWarnings: allergy.warnings,
-        safetyLevel: allergy.safetyLevel,
+        safetyLevel: hardExcluded && allergy.safetyLevel === "compatible"
+          ? "caution"
+          : allergy.safetyLevel,
         distanceKm: Math.round(distanceKm * 10) / 10,
+        missingDataFlags: Array.from(new Set(missingDataFlags)),
+        conflictExplanation,
+        scoreExplain,
       };
     });
 
-  // Medical allergy conflicts sink to bottom but remain visible with clear labeling
   ranked.sort((a, b) => {
+    const aHard = a.safetyLevel === "conflict" || Boolean(a.conflictExplanation);
+    const bHard = b.safetyLevel === "conflict" || Boolean(b.conflictExplanation);
+    if (aHard !== bHard) return aHard ? 1 : -1;
     const order = { compatible: 0, caution: 1, unknown: 2, conflict: 3 };
     if (order[a.safetyLevel] !== order[b.safetyLevel]) {
       return order[a.safetyLevel] - order[b.safetyLevel];
     }
-    return b.matchScore - a.matchScore;
+    const as = a.matchScore ?? -1;
+    const bs = b.matchScore ?? -1;
+    return bs - as;
   });
 
   return ranked;
+}
+
+export function describeNoFullMatch(results: RankedRestaurant[]): string | null {
+  const safe = results.filter((r) => r.safetyLevel !== "conflict");
+  if (results.length === 0) {
+    return "No venues in demo inventory for this city. Try Barcelona or Lisbon, or relax destination.";
+  }
+  if (safe.length === 0) {
+    return "Every candidate has a medical allergy conflict. Safety constraints cannot be relaxed — try another cuisine area or verify a chef-safe option directly with venues.";
+  }
+  const top = safe[0];
+  if ((top.matchScore ?? 0) < 55 || top.conflictExplanation) {
+    return "No perfect match. We kept safety filters strict. Consider relaxing non-safety constraints (budget, cuisine, distance, atmosphere).";
+  }
+  return null;
 }

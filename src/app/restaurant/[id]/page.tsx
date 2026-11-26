@@ -5,10 +5,15 @@ import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { ALLERGEN_LABEL, SAFETY_COPY } from "@/lib/allergens";
-import { loadDiscoveryState } from "@/lib/discovery-store";
+import {
+  loadDiscoveryState,
+  loadSavedIds,
+  toggleSaved,
+} from "@/lib/discovery-store";
 import { getRestaurantById, RESTAURANTS } from "@/lib/mock-restaurants";
 import { rankRestaurants } from "@/lib/ranking";
 import { DetailSkeleton } from "@/components/Skeleton";
+import { DemoModeBanner } from "@/components/DemoModeBanner";
 import {
   SafetyBanner,
   SafetyLevelPill,
@@ -20,6 +25,7 @@ export default function RestaurantDetailPage() {
   const params = useParams<{ id: string }>();
   const [loading, setLoading] = useState(true);
   const [ranked, setRanked] = useState<RankedRestaurant | null>(null);
+  const [saved, setSaved] = useState(false);
 
   const base = useMemo(
     () => getRestaurantById(params.id),
@@ -37,14 +43,19 @@ export default function RestaurantDetailPage() {
         RESTAURANTS.filter((r) => r.city === base.city),
         state,
       );
-      setRanked(list.find((r) => r.id === base.id) ?? {
-        ...base,
-        matchScore: 0,
-        matchReasons: [],
-        allergyWarnings: [],
-        safetyLevel: "unknown" as const,
-        distanceKm: 0,
-      });
+      setRanked(
+        list.find((r) => r.id === base.id) ?? {
+          ...base,
+          matchScore: null,
+          matchReasons: [],
+          allergyWarnings: [],
+          safetyLevel: "unknown" as const,
+          distanceKm: 0,
+          missingDataFlags: [],
+          scoreExplain: [],
+        },
+      );
+      setSaved(loadSavedIds().includes(base.id));
       setLoading(false);
     }, 400);
     return () => clearTimeout(t);
@@ -97,10 +108,19 @@ export default function RestaurantDetailPage() {
             </p>
           </div>
           <div className="flex flex-col items-end gap-2">
-            <span className="rounded-full bg-forest px-3 py-1 text-sm font-semibold text-cream">
-              {ranked.matchScore}% match
+            <span className="rounded-full bg-forest px-3 py-1 text-sm font-semibold text-cream dark:bg-forest-mid">
+              {ranked.matchScore != null
+                ? `${ranked.matchScore}% match`
+                : "Match % unavailable"}
             </span>
             <SafetyLevelPill level={ranked.safetyLevel} />
+            <button
+              type="button"
+              className="btn-secondary !py-2 text-xs"
+              onClick={() => setSaved(toggleSaved(ranked.id).includes(ranked.id))}
+            >
+              {saved ? "Saved ♥" : "Save"}
+            </button>
           </div>
         </div>
 
@@ -123,9 +143,34 @@ export default function RestaurantDetailPage() {
         </div>
       </div>
 
-      <div className="mt-8">
+      <div className="mt-8 space-y-3">
+        <DemoModeBanner compact />
         <SafetyBanner />
       </div>
+
+      {ranked.scoreExplain.length > 0 && (
+        <section className="mt-6 card-surface p-5">
+          <h2 className="font-display text-lg font-semibold text-forest dark:text-cream">
+            Why this score
+          </h2>
+          <p className="mt-1 text-xs text-ink-muted">
+            Preference fit only — allergen safety is labeled separately and never
+            implied by match %.
+          </p>
+          <ul className="mt-3 space-y-1 text-sm text-ink-soft">
+            {ranked.scoreExplain.map((s) => (
+              <li key={s}>· {s}</li>
+            ))}
+          </ul>
+          {ranked.missingDataFlags.length > 0 && (
+            <ul className="mt-3 space-y-1 text-xs text-amber-800 dark:text-amber-200">
+              {ranked.missingDataFlags.map((f) => (
+                <li key={f}>⚠ {f}</li>
+              ))}
+            </ul>
+          )}
+        </section>
+      )}
 
       {ranked.allergyWarnings.length > 0 && (
         <div className="mt-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3">

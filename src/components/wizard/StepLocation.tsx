@@ -29,34 +29,53 @@ export function StepLocation({
       </div>
 
       <div className="space-y-4">
-        <div>
-          <label className="mb-1.5 block text-sm font-medium text-charcoal-soft">
-            City / destination
-          </label>
-          <input
-            className="input-field"
-            value={value.city}
-            onChange={(e) => onChange({ ...value, city: e.target.value })}
-            placeholder="Barcelona"
-            list="wizard-cities"
-          />
-          <datalist id="wizard-cities">
-            {DEMO_CITIES.map((c) => (
-              <option key={c} value={c} />
-            ))}
-          </datalist>
-          <div className="mt-2 flex flex-wrap gap-2">
-            {DEMO_CITIES.map((c) => (
-              <button
-                key={c}
-                type="button"
-                className={`chip text-xs ${value.city === c ? "chip-active" : "chip-idle"}`}
-                onClick={() => onChange({ ...value, city: c })}
-              >
-                {c}
-              </button>
-            ))}
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div>
+            <label className="mb-1.5 block text-sm font-medium text-charcoal-soft">
+              Country (optional)
+            </label>
+            <input
+              className="input-field"
+              value={value.country}
+              onChange={(e) => onChange({ ...value, country: e.target.value })}
+              placeholder="Spain"
+            />
           </div>
+          <div>
+            <label className="mb-1.5 block text-sm font-medium text-charcoal-soft">
+              City / destination
+            </label>
+            <input
+              className="input-field"
+              value={value.city}
+              onChange={(e) => onChange({ ...value, city: e.target.value })}
+              placeholder="Barcelona"
+              list="wizard-cities"
+            />
+            <datalist id="wizard-cities">
+              {DEMO_CITIES.map((c) => (
+                <option key={c} value={c} />
+              ))}
+            </datalist>
+          </div>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {DEMO_CITIES.map((c) => (
+            <button
+              key={c}
+              type="button"
+              className={`chip text-xs ${value.city === c ? "chip-active" : "chip-idle"}`}
+              onClick={() =>
+                onChange({
+                  ...value,
+                  city: c,
+                  country: c === "Lisbon" ? "Portugal" : "Spain",
+                })
+              }
+            >
+              {c}
+            </button>
+          ))}
         </div>
 
         <div>

@@ -73,7 +73,45 @@ function allergenSet(
 
 export const DEMO_CITIES = ["Barcelona", "Lisbon"] as const;
 
-export const RESTAURANTS: Restaurant[] = [
+type DemoSeed = Omit<
+  Restaurant,
+  | "country"
+  | "reviewReliability"
+  | "wheelchairAccessible"
+  | "dataCompleteness"
+  | "openNow"
+> &
+  Partial<
+    Pick<
+      Restaurant,
+      | "country"
+      | "reviewReliability"
+      | "wheelchairAccessible"
+      | "dataCompleteness"
+      | "openNow"
+    >
+  >;
+
+function normalizeDemo(r: DemoSeed): Restaurant {
+  const unavailable = r.allergens.filter((a) => a.source === "unavailable").length;
+  const completeness = Math.max(
+    0.35,
+    Math.min(1, 1 - unavailable / 28 + (r.reviewCount > 800 ? 0.1 : 0)),
+  );
+  return {
+    ...r,
+    openNow: r.openNow ?? true,
+    country: r.country ?? (r.city === "Lisbon" ? "Portugal" : "Spain"),
+    reviewReliability:
+      r.reviewReliability ??
+      (r.reviewCount > 1500 ? "high" : r.reviewCount > 500 ? "medium" : "low"),
+    wheelchairAccessible:
+      r.wheelchairAccessible ?? Boolean(r.childFriendly || r.acceptsLargeGroups),
+    dataCompleteness: r.dataCompleteness ?? completeness,
+  };
+}
+
+const DEMO_SEEDS: DemoSeed[] = [
   {
     id: "bcn-cal-pep",
     name: "Cal Pep",
@@ -732,6 +770,8 @@ export const RESTAURANTS: Restaurant[] = [
     highlights: ["Ceviche", "Iconic interior", "Walk-in"],
   },
 ];
+
+export const RESTAURANTS: Restaurant[] = DEMO_SEEDS.map(normalizeDemo);
 
 export function getRestaurantById(id: string): Restaurant | undefined {
   return RESTAURANTS.find((r) => r.id === id);

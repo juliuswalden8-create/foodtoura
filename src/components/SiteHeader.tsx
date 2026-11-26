@@ -1,35 +1,29 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { ThemeToggle } from "./ThemeToggle";
 
 export function SiteHeader() {
-  const pathname = usePathname();
-  const onDiscover = pathname.startsWith("/discover");
-
   return (
-    <header className="sticky top-0 z-40 border-b border-mist/70 bg-cream/85 backdrop-blur-md">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3.5 sm:px-6">
+    <header className="sticky top-0 z-40 border-b border-mist/70 bg-cream/85 backdrop-blur-md dark:border-white/10 dark:bg-[#121614]/90">
+      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
         <Link href="/" className="group flex items-baseline gap-2">
-          <span className="font-display text-2xl font-semibold tracking-tight text-forest transition group-hover:text-forest-soft">
+          <span className="font-display text-2xl font-semibold tracking-tight text-forest transition group-hover:text-forest-mid dark:text-cream">
             FoodToura
           </span>
-          <span className="hidden text-xs text-charcoal-muted sm:inline">
+          <span className="hidden text-xs text-ink-muted sm:inline">
             Your taste. Your journey.
           </span>
         </Link>
-        <nav className="flex items-center gap-2">
-          {!onDiscover && (
-            <Link href="/discover" className="btn-primary !px-4 !py-2.5 text-xs sm:text-sm">
-              Find my perfect restaurant
-            </Link>
-          )}
-          {onDiscover && (
-            <Link href="/" className="btn-secondary !px-4 !py-2.5 text-xs sm:text-sm">
-              Home
-            </Link>
-          )}
-        </nav>
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
+          <Link
+            href="/guide"
+            className="btn-primary !hidden !px-4 !py-2.5 text-xs sm:!inline-flex sm:text-sm"
+          >
+            AI search
+          </Link>
+        </div>
       </div>
     </header>
   );

@@ -17,6 +17,8 @@ export function LocationSearch() {
   function startWithCity(nextCity: string, coords?: { lat: number; lng: number }) {
     const state = defaultDiscoveryState();
     state.location.city = nextCity;
+    state.location.country =
+      nextCity === "Lisbon" ? "Portugal" : nextCity === "Barcelona" ? "Spain" : "";
     if (coords) {
       state.location.useCurrentLocation = true;
       state.location.lat = coords.lat;
