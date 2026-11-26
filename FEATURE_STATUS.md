@@ -8,7 +8,7 @@ Last updated: 2026-11-26
 |---------|--------|-------|-------------|
 | Homepage discovery search | Working with limitations | Hero + NL → Guide; tools secondary | — |
 | Guided wizard | Working with limitations | 4 steps; demo cities strongest | — |
-| AI Guide (NL → chips) | Working with limitations | Heuristic parser (LLM-ready interface) | Optional LLM later |
+| AI Guide (conversational) | Working with limitations | Messaging UX + in-chat cards via `/api/discover`; heuristic NL (LLM-ready) | Optional LLM later; Places key for live |
 | Explainable ranking | Working with limitations | Deterministic; allergies fail-closed | — |
 | Results List / Map / Swipe | Working with limitations | Map is coordinate plot, not Mapbox | Mapbox optional |
 | Results sort + editable chips | Working with limitations | Client re-rank; no Places re-query on chip | — |

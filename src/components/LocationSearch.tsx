@@ -107,7 +107,7 @@ export function LocationSearch() {
             <option key={c} value={c} />
           ))}
         </datalist>
-        <button type="submit" className="btn-primary whitespace-nowrap">
+        <button type="submit" className="btn-primary whitespace-nowrap !text-white">
           Find my perfect restaurant
         </button>
       </form>

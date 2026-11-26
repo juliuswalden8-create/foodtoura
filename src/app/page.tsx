@@ -99,7 +99,7 @@ export default function HomePage() {
             className="object-cover"
             sizes="100vw"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-cream via-cream/85 to-cream/35 dark:from-[#121614] dark:via-[#121614]/90 dark:to-[#121614]/40" />
+          <div className="absolute inset-0 bg-gradient-to-t from-cream from-35% via-cream/95 to-cream/50 dark:from-[#1c2420] dark:via-[#1c2420]/95 dark:to-[#1c2420]/45" />
         </div>
 
         <div className="relative mx-auto flex min-h-[70dvh] max-w-6xl flex-col justify-end px-4 pb-10 pt-20 sm:min-h-[75dvh] sm:justify-center sm:px-6 sm:pb-16">
@@ -114,14 +114,17 @@ export default function HomePage() {
               A new city. A thousand restaurants. One perfect match.
             </h1>
             <p
-              className="animate-fade-up mt-4 max-w-md text-base leading-relaxed text-ink-soft dark:text-ink-muted sm:text-lg"
+              className="animate-fade-up mt-4 max-w-md text-base leading-relaxed text-ink dark:text-cream/90 sm:text-lg"
               style={{ animationDelay: "80ms" }}
             >
               Tell us what you love, what you need and who you&apos;re traveling
               with. We&apos;ll help you discover restaurants that fit your
               journey.
             </p>
-            <div className="mt-7">
+            <div
+              className="animate-fade-up mt-7 rounded-3xl border border-mist/90 bg-card/95 p-4 shadow-soft backdrop-blur-sm dark:border-border dark:bg-card/95"
+              style={{ animationDelay: "120ms" }}
+            >
               <LocationSearch />
             </div>
           </div>
@@ -163,7 +166,7 @@ export default function HomePage() {
 
           <form onSubmit={runAiSearch} className="mt-5">
             <label className="mb-1.5 block text-sm font-medium text-ink-soft">
-              AI search — no account needed
+              Tell your guide what you&apos;re craving
             </label>
             <div className="flex flex-col gap-3 sm:flex-row">
               <input
@@ -173,7 +176,7 @@ export default function HomePage() {
                 onChange={(e) => setQuery(e.target.value)}
               />
               <button type="submit" className="btn-primary whitespace-nowrap">
-                Search with AI Guide
+                Ask your local guide
               </button>
             </div>
           </form>

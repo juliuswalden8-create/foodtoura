@@ -337,7 +337,7 @@ function GuideInner() {
   const empty = session.messages.length === 0;
 
   return (
-    <div className="relative mx-auto flex min-h-[calc(100dvh-8rem)] max-w-2xl flex-col">
+    <div className="relative mx-auto flex min-h-[calc(100dvh-8rem)] max-w-2xl flex-col pb-28">
       {/* Header */}
       <div className="sticky top-0 z-20 border-b border-mist/80 bg-cream/90 px-4 py-3 backdrop-blur-md dark:border-border dark:bg-[#1c2420]/90 sm:px-6">
         <div className="flex items-center justify-between gap-3">
@@ -452,11 +452,11 @@ function GuideInner() {
         <div ref={bottomRef} />
       </div>
 
-      {/* Composer */}
-      <div className="sticky bottom-[calc(3.75rem+env(safe-area-inset-bottom))] z-20 border-t border-mist/80 bg-cream/95 px-3 py-3 backdrop-blur-md dark:border-border dark:bg-[#1c2420]/95 sm:px-6">
+      {/* Composer — fixed above bottom nav */}
+      <div className="fixed inset-x-0 bottom-[calc(3.6rem+env(safe-area-inset-bottom))] z-40 border-t border-mist/80 bg-cream/95 px-3 py-3 backdrop-blur-md dark:border-border dark:bg-[#1c2420]/95 sm:px-6">
         <form
           onSubmit={onSubmit}
-          className="flex items-end gap-2 rounded-3xl border border-mist bg-card p-2 shadow-soft dark:border-border"
+          className="mx-auto flex max-w-2xl items-end gap-2 rounded-3xl border border-mist bg-card p-2 shadow-soft dark:border-border"
         >
           <label className="sr-only" htmlFor="guide-composer">
             Message your local guide

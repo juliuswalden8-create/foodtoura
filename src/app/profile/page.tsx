@@ -6,7 +6,7 @@ import { DemoModeBanner } from "@/components/DemoModeBanner";
 import { resetTaste } from "@/lib/taste-profile";
 
 const LINKS = [
-  { href: "/guide", label: "AI Guide" },
+  { href: "/guide", label: "Your local guide" },
   { href: "/tinder", label: "Food Tinder / taste" },
   { href: "/mood", label: "Mood Match" },
   { href: "/group", label: "Group Match" },

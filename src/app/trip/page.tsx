@@ -108,7 +108,7 @@ function TripInner() {
           Open matches
         </button>
         <Link href="/guide" className="btn-secondary">
-          Edit in AI Guide
+          Ask your guide
         </Link>
       </div>
     </div>
