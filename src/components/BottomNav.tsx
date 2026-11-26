@@ -17,7 +17,7 @@ export function BottomNav() {
   return (
     <nav
       aria-label="Primary"
-      className="fixed inset-x-0 bottom-0 z-50 border-t border-mist/80 bg-cream/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-md dark:border-white/10 dark:bg-[#121614]/95"
+      className="fixed inset-x-0 bottom-0 z-50 border-t border-[#E8DFD0] bg-[#FAF7F0]/98 pb-[env(safe-area-inset-bottom)] backdrop-blur-md"
     >
       <ul className="mx-auto flex max-w-lg items-stretch justify-between px-2 pt-1.5">
         {ITEMS.map((item) => {
@@ -32,8 +32,8 @@ export function BottomNav() {
                 href={item.href}
                 className={`flex flex-col items-center gap-0.5 rounded-2xl px-1 py-2 text-[10px] font-semibold transition sm:text-[11px] ${
                   active
-                    ? "text-terracotta"
-                    : "text-ink-muted hover:text-forest dark:hover:text-cream"
+                    ? "text-[#C9856B]"
+                    : "text-[#7A7F76] hover:text-[#344E41]"
                 }`}
               >
                 <Icon active={active} />

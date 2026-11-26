@@ -87,7 +87,7 @@ export default function PassportPage() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 sm:py-12">
       <p className="text-sm font-medium text-terracotta">Allergy Passport</p>
-      <h1 className="mt-1 font-display text-3xl font-semibold text-forest dark:text-cream">
+      <h1 className="mt-1 font-display text-3xl font-semibold text-forest">
         Show staff what you need
       </h1>
       <p className="mt-2 text-ink-soft">
@@ -145,7 +145,7 @@ export default function PassportPage() {
               {EU_ALLERGENS.map((a) => {
                 const sel = passport.allergens.find((x) => x.allergen === a.id);
                 return (
-                  <div key={a.id} className="rounded-2xl border border-mist p-3 dark:border-white/10">
+                  <div key={a.id} className="rounded-2xl border border-mist p-3">
                     <label className="flex items-center gap-2 text-sm">
                       <input
                         type="checkbox"
@@ -221,8 +221,8 @@ export default function PassportPage() {
         </div>
 
         <div>
-          <div className="card-surface border-2 border-forest/20 bg-cream p-5 dark:bg-[#1a1f1c]">
-            <p className="font-display text-xl font-semibold text-forest dark:text-cream">
+          <div className="card-surface border-2 border-forest/20 bg-cream p-5">
+            <p className="font-display text-xl font-semibold text-forest">
               {phrases.title}
             </p>
             <pre className="mt-4 whitespace-pre-wrap font-sans text-sm leading-relaxed text-ink">

@@ -46,7 +46,7 @@ export function RestaurantCard({
           />
           <div className="absolute left-3 top-3 flex flex-wrap gap-2">
             {restaurant.matchScore != null ? (
-              <span className="rounded-full bg-cream/95 px-3 py-1 text-xs font-semibold text-forest shadow-sm dark:bg-ink/90 dark:text-cream">
+              <span className="rounded-full bg-cream/95 px-3 py-1 text-xs font-semibold text-forest shadow-sm">
                 {restaurant.matchScore}% match
               </span>
             ) : (
@@ -61,7 +61,7 @@ export function RestaurantCard({
         <div className="flex items-start justify-between gap-3">
           <div>
             <Link href={`/restaurant/${restaurant.id}`}>
-              <h3 className="font-display text-xl font-semibold text-forest dark:text-cream">
+              <h3 className="font-display text-xl font-semibold text-forest">
                 {restaurant.name}
               </h3>
             </Link>
@@ -91,7 +91,7 @@ export function RestaurantCard({
         <div className="flex flex-wrap gap-2">
           <SafetyLevelPill level={restaurant.safetyLevel} />
           {restaurant.authenticityScore != null && (
-            <span className="rounded-full bg-sand px-2.5 py-1 text-[11px] font-medium text-charcoal-soft dark:bg-white/10 dark:text-cream">
+            <span className="rounded-full bg-sand px-2.5 py-1 text-[11px] font-medium text-charcoal-soft">
               {authenticityLabel(restaurant.authenticityScore)}
               {restaurant.touristTrapRisk === "high" ? " · trap risk*" : ""}
             </span>
@@ -104,12 +104,12 @@ export function RestaurantCard({
         </div>
 
         {restaurant.matchReasons[0] && (
-          <p className="text-xs text-forest-muted dark:text-forest-mid">
+          <p className="text-xs text-forest-muted">
             · {restaurant.matchReasons[0]}
           </p>
         )}
         {restaurant.missingDataFlags[0] && (
-          <p className="text-xs text-amber-800 dark:text-amber-200">
+          <p className="text-xs text-amber-800">
             · {restaurant.missingDataFlags[0]}
           </p>
         )}
@@ -120,7 +120,7 @@ export function RestaurantCard({
           </p>
         )}
 
-        <div className="flex flex-wrap gap-2 border-t border-mist/80 pt-3 dark:border-white/10">
+        <div className="flex flex-wrap gap-2 border-t border-mist/80 pt-3">
           <Link
             href={`/restaurant/${restaurant.id}`}
             className="chip chip-idle text-xs"

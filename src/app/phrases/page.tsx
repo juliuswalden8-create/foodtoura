@@ -19,7 +19,7 @@ export default function PhrasesPage() {
   return (
     <div className="mx-auto max-w-2xl px-4 py-8 sm:px-6 sm:py-12">
       <p className="text-sm font-medium text-terracotta">Phrase book</p>
-      <h1 className="mt-1 font-display text-3xl font-semibold text-forest dark:text-cream">
+      <h1 className="mt-1 font-display text-3xl font-semibold text-forest">
         Tell the kitchen clearly
       </h1>
       <p className="mt-2 text-ink-soft">
@@ -48,7 +48,7 @@ export default function PhrasesPage() {
       <ul className="mt-6 space-y-3">
         {PHRASES.map((p) => (
           <li key={p.id} className="card-surface p-4">
-            <p className="text-sm font-semibold text-forest dark:text-cream">
+            <p className="text-sm font-semibold text-forest">
               {p[lang]}
             </p>
             {lang !== "en" && (

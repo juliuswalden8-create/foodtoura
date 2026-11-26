@@ -2,6 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Light-only design system — dark mode disabled until fully designed */
 :root {
   --cream: #faf7f0;
   --sand: #f1ece3;
@@ -9,42 +10,27 @@
   --forest: #344e41;
   --forest-mid: #879b7c;
   --terracotta: #c9856b;
+  --terracotta-deep: #a86b52;
   --ink: #303a32;
   --ink-soft: #62675e;
+  --ink-muted: #7a7f76;
   --border: #e8dfd0;
-  --surface: #fffdf9;
   --bg: #faf7f0;
-  --muted: #62675e;
-}
-
-/* Optional dark — never the default. Tuned for contrast, not pure black. */
-.dark {
-  --cream: #1c2420;
-  --sand: #24302a;
-  --card: #24302a;
-  --forest: #c5d4bc;
-  --forest-mid: #879b7c;
-  --terracotta: #d4a08c;
-  --ink: #f4f1ea;
-  --ink-soft: #c4c8c0;
-  --border: #3a4540;
-  --surface: #24302a;
-  --bg: #1c2420;
-  --muted: #a8aea6;
 }
 
 html {
   scroll-behavior: smooth;
-  color-scheme: light;
+  color-scheme: light !important;
 }
 
 html.dark {
-  color-scheme: dark;
+  /* Ignore legacy dark class — keep light tokens */
+  color-scheme: light !important;
 }
 
 body {
-  background: var(--bg);
-  color: var(--ink);
+  background: #faf7f0 !important;
+  color: #303a32 !important;
   min-height: 100dvh;
 }
 
@@ -56,9 +42,9 @@ body {
   .skeleton {
     background: linear-gradient(
       90deg,
-      color-mix(in srgb, var(--border) 80%, transparent) 0%,
-      color-mix(in srgb, var(--muted) 25%, transparent) 45%,
-      color-mix(in srgb, var(--border) 80%, transparent) 100%
+      #e8dfd0 0%,
+      #f1ece3 45%,
+      #e8dfd0 100%
     );
     background-size: 200% 100%;
     @apply animate-shimmer rounded-xl;
@@ -71,40 +57,35 @@ body {
   .pb-nav {
     padding-bottom: calc(5.5rem + env(safe-area-inset-bottom));
   }
-
-  .pb-composer {
-    padding-bottom: calc(7.5rem + env(safe-area-inset-bottom));
-  }
 }
 
 @layer components {
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-full bg-terracotta px-6 py-3.5 text-sm font-semibold text-white shadow-soft transition hover:bg-terracotta-deep focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-terracotta disabled:cursor-not-allowed disabled:opacity-50;
+    @apply inline-flex items-center justify-center gap-2 rounded-full bg-[#C9856B] px-6 py-3.5 text-sm font-semibold text-white shadow-soft transition hover:bg-[#A86B52] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C9856B] disabled:cursor-not-allowed disabled:opacity-50;
   }
 
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 rounded-full border border-[#E8DFD0] bg-[#FFFDF9] px-5 py-3 text-sm font-semibold text-[#344E41] transition hover:border-[#344E41]/30 hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#344E41] dark:border-[#3a4540] dark:bg-[#2a3530] dark:text-[#f4f1ea] dark:hover:bg-[#324038];
+    @apply inline-flex items-center justify-center gap-2 rounded-full border border-[#E8DFD0] bg-[#FFFDF9] px-5 py-3 text-sm font-semibold text-[#344E41] transition hover:border-[#344E41]/30 hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#344E41];
   }
 
   .chip {
     @apply inline-flex items-center gap-1.5 rounded-full border px-3.5 py-2 text-sm font-medium transition;
   }
 
-  /* Never use text-cream here — Tailwind cream is light and vanishes on white cards */
   .chip-idle {
-    @apply border-[#E8DFD0] bg-[#FFFDF9] text-[#344E41] hover:border-[#344E41]/35 hover:bg-white dark:border-[#3a4540] dark:bg-[#2a3530] dark:text-[#f4f1ea] dark:hover:bg-[#324038];
+    @apply border-[#E8DFD0] bg-[#FFFDF9] text-[#344E41] hover:border-[#344E41]/35 hover:bg-white;
   }
 
   .chip-active {
-    @apply border-[#344E41] bg-[#344E41] text-white dark:border-[#879B7C] dark:bg-[#879B7C] dark:text-[#1c2420];
+    @apply border-[#344E41] bg-[#344E41] text-white;
   }
 
   .input-field {
-    @apply w-full rounded-2xl border border-[#E8DFD0] bg-[#FFFDF9] px-4 py-3.5 text-[#303A32] outline-none transition placeholder:text-[#7A7F76] focus:border-[#344E41]/35 focus:ring-2 focus:ring-[#344E41]/10 dark:border-[#3a4540] dark:bg-[#2a3530] dark:text-[#f4f1ea] dark:placeholder:text-[#a8aea6];
+    @apply w-full rounded-2xl border border-[#E8DFD0] bg-[#FFFDF9] px-4 py-3.5 text-[#303A32] outline-none transition placeholder:text-[#7A7F76] focus:border-[#344E41]/35 focus:ring-2 focus:ring-[#344E41]/10;
   }
 
   .card-surface {
-    @apply rounded-3xl border border-[#E8DFD0]/90 bg-[#FFFDF9] shadow-card dark:border-[#3a4540] dark:bg-[#24302a];
+    @apply rounded-3xl border border-[#E8DFD0] bg-[#FFFDF9] shadow-card;
   }
 
   .msg-user {
@@ -112,6 +93,6 @@ body {
   }
 
   .msg-assistant {
-    @apply mr-auto max-w-[90%] rounded-3xl rounded-bl-lg border border-[#E8DFD0] bg-[#FFFDF9] px-4 py-3 text-sm leading-relaxed text-[#303A32] shadow-card dark:border-[#3a4540] dark:bg-[#2a3530] dark:text-[#f4f1ea];
+    @apply mr-auto max-w-[90%] rounded-3xl rounded-bl-lg border border-[#E8DFD0] bg-[#FFFDF9] px-4 py-3 text-sm leading-relaxed text-[#303A32] shadow-card;
   }
 }

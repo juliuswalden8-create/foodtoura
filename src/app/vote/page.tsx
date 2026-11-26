@@ -52,7 +52,7 @@ export default function VotePage() {
   return (
     <div className="mx-auto max-w-xl px-4 py-8 sm:px-6 sm:py-12">
       <p className="text-sm font-medium text-terracotta">Group vote</p>
-      <h1 className="mt-1 font-display text-3xl font-semibold text-forest dark:text-cream">
+      <h1 className="mt-1 font-display text-3xl font-semibold text-forest">
         Pick a winner together
       </h1>
       <p className="mt-2 text-ink-soft">
@@ -98,7 +98,7 @@ export default function VotePage() {
                 <div className="min-w-0 flex-1">
                   <Link
                     href={`/restaurant/${r.id}`}
-                    className="font-display text-lg font-semibold text-forest dark:text-cream"
+                    className="font-display text-lg font-semibold text-forest"
                   >
                     {r.name}
                   </Link>
@@ -136,7 +136,7 @@ export default function VotePage() {
       </ul>
 
       {ordered[0] && (
-        <p className="mt-6 text-sm text-forest dark:text-cream">
+        <p className="mt-6 text-sm text-forest">
           Current leader:{" "}
           <strong>
             {RESTAURANTS.find((r) => r.id === ordered[0])?.name || "—"}

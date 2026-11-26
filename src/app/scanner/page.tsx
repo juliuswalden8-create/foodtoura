@@ -67,7 +67,7 @@ export default function ScannerPage() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 sm:py-12">
       <p className="text-sm font-medium text-terracotta">Smart Menu Scanner</p>
-      <h1 className="mt-1 font-display text-3xl font-semibold text-forest dark:text-cream">
+      <h1 className="mt-1 font-display text-3xl font-semibold text-forest">
         Check a menu for allergens
       </h1>
       <p className="mt-2 text-ink-soft">
@@ -124,7 +124,7 @@ export default function ScannerPage() {
 
       {result && (
         <div className="mt-6 space-y-4">
-          <div className="rounded-2xl border border-amber-300/50 bg-amber-50 px-4 py-3 text-sm text-amber-950 dark:border-amber-500/30 dark:bg-amber-950/30 dark:text-amber-100">
+          <div className="rounded-2xl border border-amber-300/50 bg-amber-50 px-4 py-3 text-sm text-amber-950">
             {result.disclaimer}
           </div>
 
@@ -134,14 +134,14 @@ export default function ScannerPage() {
               <strong>not</strong> mean the menu is safe — confirm with staff.
             </div>
           ) : (
-            <div className="card-surface divide-y divide-mist dark:divide-white/10">
+            <div className="card-surface divide-y divide-mist">
               {result.hits.map((h) => (
                 <div key={h.allergen} className="p-4">
                   <div className="flex flex-wrap items-center gap-2">
-                    <p className="font-semibold text-forest dark:text-cream">
+                    <p className="font-semibold text-forest">
                       {h.label}
                     </p>
-                    <span className="rounded-full bg-sand px-2 py-0.5 text-[11px] font-semibold dark:bg-white/10">
+                    <span className="rounded-full bg-sand px-2 py-0.5 text-[11px] font-semibold">
                       {h.confidence} confidence
                     </span>
                   </div>
@@ -157,7 +157,7 @@ export default function ScannerPage() {
 
           {result.dishes.length > 0 && (
             <div className="card-surface p-5">
-              <h2 className="font-display text-lg font-semibold text-forest dark:text-cream">
+              <h2 className="font-display text-lg font-semibold text-forest">
                 Flagged dish lines
               </h2>
               <ul className="mt-3 space-y-2 text-sm">

@@ -46,7 +46,7 @@ export default function WaiterPage() {
   return (
     <div className="mx-auto max-w-2xl px-4 py-8 sm:px-6 sm:py-12">
       <p className="text-sm font-medium text-terracotta">AI Waiter</p>
-      <h1 className="mt-1 font-display text-3xl font-semibold text-forest dark:text-cream">
+      <h1 className="mt-1 font-display text-3xl font-semibold text-forest">
         Speak with the table
       </h1>
       <p className="mt-2 text-ink-soft">
@@ -75,7 +75,7 @@ export default function WaiterPage() {
       <ul className="mt-6 space-y-3">
         {ALL.map((p) => (
           <li key={p.id} className="card-surface p-4">
-            <p className="text-lg font-semibold text-forest dark:text-cream">
+            <p className="text-lg font-semibold text-forest">
               {p[lang]}
             </p>
             {lang !== "en" && (
@@ -122,10 +122,10 @@ export default function WaiterPage() {
       {fullscreen && (
         <button
           type="button"
-          className="fixed inset-0 z-[80] flex items-center justify-center bg-cream p-8 text-center dark:bg-ink"
+          className="fixed inset-0 z-[80] flex items-center justify-center bg-cream p-8 text-center"
           onClick={() => setFullscreen(null)}
         >
-          <p className="font-display text-3xl font-semibold leading-snug text-forest dark:text-cream sm:text-5xl">
+          <p className="font-display text-3xl font-semibold leading-snug text-forest sm:text-5xl">
             {fullscreen}
           </p>
         </button>

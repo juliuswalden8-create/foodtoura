@@ -142,7 +142,7 @@ export default function TinderPage() {
   return (
     <div className="mx-auto max-w-md px-4 py-8 sm:px-6">
       <p className="text-sm font-medium text-terracotta">Food Tinder</p>
-      <h1 className="mt-1 font-display text-3xl font-semibold text-forest dark:text-cream">
+      <h1 className="mt-1 font-display text-3xl font-semibold text-forest">
         Train your taste
       </h1>
       <p className="mt-2 text-sm text-ink-soft">
@@ -153,7 +153,7 @@ export default function TinderPage() {
         <DemoModeBanner compact />
       </div>
 
-      <div className="mt-4 h-2 overflow-hidden rounded-full bg-mist dark:bg-white/10">
+      <div className="mt-4 h-2 overflow-hidden rounded-full bg-mist">
         <div
           className="h-full rounded-full bg-terracotta transition-all"
           style={{ width: `${progress}%` }}
@@ -166,7 +166,7 @@ export default function TinderPage() {
           <Image src={card.image} alt={card.title} fill className="object-cover" sizes="400px" />
         </div>
         <div className="p-4">
-          <p className="font-display text-2xl font-semibold text-forest dark:text-cream">
+          <p className="font-display text-2xl font-semibold text-forest">
             {card.title}
           </p>
           <p className="text-sm text-ink-muted">
@@ -181,7 +181,7 @@ export default function TinderPage() {
         </button>
         <button
           type="button"
-          className="flex h-14 w-14 items-center justify-center rounded-full bg-ink text-lg text-cream"
+          className="flex h-14 w-14 items-center justify-center rounded-full bg-ink text-lg text-white"
           onClick={() => apply(false)}
           aria-label="Dislike"
         >
@@ -196,7 +196,7 @@ export default function TinderPage() {
         </button>
         <button
           type="button"
-          className="flex h-14 w-14 items-center justify-center rounded-full bg-terracotta text-lg text-cream"
+          className="flex h-14 w-14 items-center justify-center rounded-full bg-terracotta text-lg text-white"
           onClick={() => apply(true)}
           aria-label="Like"
         >

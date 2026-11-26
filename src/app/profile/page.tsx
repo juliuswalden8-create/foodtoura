@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { ThemeToggle } from "@/components/ThemeToggle";
 import { DemoModeBanner } from "@/components/DemoModeBanner";
 import { resetTaste } from "@/lib/taste-profile";
 
@@ -25,7 +24,7 @@ const LINKS = [
 export default function ProfilePage() {
   return (
     <div className="mx-auto max-w-xl px-4 py-8 sm:px-6 sm:py-12">
-      <h1 className="font-display text-3xl font-semibold text-forest dark:text-cream">
+      <h1 className="font-display text-3xl font-semibold text-forest">
         Profile
       </h1>
       <p className="mt-2 text-ink-soft">
@@ -37,15 +36,14 @@ export default function ProfilePage() {
       </div>
 
       <div className="card-surface mt-6 space-y-4 p-5">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="font-semibold text-forest dark:text-cream">Appearance</p>
-            <p className="text-sm text-ink-muted">Light / dark mode</p>
-          </div>
-          <ThemeToggle />
+        <div>
+          <p className="font-semibold text-[#344E41]">Appearance</p>
+          <p className="mt-1 text-sm text-[#62675E]">
+            FoodToura uses a warm light theme for clarity while traveling.
+          </p>
         </div>
-        <div className="border-t border-mist pt-4 dark:border-white/10">
-          <p className="font-semibold text-forest dark:text-cream">Taste profile</p>
+        <div className="border-t border-[#E8DFD0] pt-4">
+          <p className="font-semibold text-[#344E41]">Taste profile</p>
           <p className="mt-1 text-sm text-ink-muted">
             Food Tinder likes reshape soft ranking only — never allergy safety.
           </p>
@@ -57,15 +55,15 @@ export default function ProfilePage() {
             Reset taste profile
           </button>
         </div>
-        <div className="border-t border-mist pt-4 dark:border-white/10">
-          <p className="font-semibold text-forest dark:text-cream">Privacy</p>
+        <div className="border-t border-mist pt-4">
+          <p className="font-semibold text-forest">Privacy</p>
           <p className="mt-1 text-sm text-ink-muted">
             Clear site data in your browser to delete local prefs, saves, journal
             and votes. Account deletion arrives with authenticated profiles.
           </p>
         </div>
-        <div className="border-t border-mist pt-4 dark:border-white/10">
-          <p className="font-semibold text-forest dark:text-cream">Live data</p>
+        <div className="border-t border-mist pt-4">
+          <p className="font-semibold text-forest">Live data</p>
           <p className="mt-1 text-sm text-ink-muted">
             Set <code className="text-xs">GOOGLE_PLACES_API_KEY</code> server-side
             for real listings. Demo and live never mix.

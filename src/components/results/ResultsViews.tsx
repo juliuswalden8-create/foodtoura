@@ -16,14 +16,14 @@ export function ViewModeToggle({
 }) {
   const items: ResultsViewMode[] = ["list", "map", "swipe"];
   return (
-    <div className="inline-flex rounded-full border border-mist bg-white/80 p-1 dark:border-white/10 dark:bg-white/5">
+    <div className="inline-flex rounded-full border border-mist bg-white/80 p-1">
       {items.map((m) => (
         <button
           key={m}
           type="button"
           className={`rounded-full px-4 py-2 text-xs font-semibold capitalize transition ${
             mode === m
-              ? "bg-forest text-cream dark:bg-forest-mid"
+              ? "bg-forest text-white"
               : "text-ink-muted hover:text-forest"
           }`}
           onClick={() => onChange(m)}
@@ -66,8 +66,8 @@ export function MapResults({ results }: { results: RankedRestaurant[] }) {
 
   return (
     <div className="space-y-4">
-      <div className="relative aspect-[4/3] overflow-hidden rounded-3xl border border-mist bg-[linear-gradient(135deg,#dfe8e2,#f3efe6)] dark:border-white/10 dark:bg-[linear-gradient(135deg,#1a2420,#121614)] sm:aspect-[16/9]">
-        <p className="absolute left-3 top-3 z-10 rounded-full bg-cream/90 px-3 py-1 text-[11px] font-semibold text-forest dark:bg-ink/80 dark:text-cream">
+      <div className="relative aspect-[4/3] overflow-hidden rounded-3xl border border-mist bg-[linear-gradient(135deg,#dfe8e2,#f3efe6)] sm:aspect-[16/9]">
+        <p className="absolute left-3 top-3 z-10 rounded-full bg-cream/90 px-3 py-1 text-[11px] font-semibold text-forest">
           Demo map · plug in Mapbox/Google later
         </p>
         {results.map((r) => (
@@ -95,7 +95,7 @@ export function MapResults({ results }: { results: RankedRestaurant[] }) {
                 <Image src={r.imageUrl} alt="" fill className="object-cover" sizes="56px" />
               </div>
               <div className="min-w-0 flex-1">
-                <p className="truncate font-semibold text-forest dark:text-cream">
+                <p className="truncate font-semibold text-forest">
                   {r.name}
                 </p>
                 <p className="text-xs text-ink-muted">
@@ -136,7 +136,7 @@ export function SwipeResults({ results }: { results: RankedRestaurant[] }) {
       <div className="mt-4 flex items-center justify-center gap-4">
         <button
           type="button"
-          className="flex h-14 w-14 items-center justify-center rounded-full border border-mist bg-white text-lg font-semibold text-ink-muted shadow-card dark:border-white/10 dark:bg-white/5"
+          className="flex h-14 w-14 items-center justify-center rounded-full border border-mist bg-white text-lg font-semibold text-ink-muted shadow-card"
           onClick={next}
           aria-label="Skip"
         >

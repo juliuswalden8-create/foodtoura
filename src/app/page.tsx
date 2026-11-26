@@ -99,22 +99,28 @@ export default function HomePage() {
             className="object-cover"
             sizes="100vw"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-cream from-35% via-cream/95 to-cream/50 dark:from-[#1c2420] dark:via-[#1c2420]/95 dark:to-[#1c2420]/45" />
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                "linear-gradient(to top, #FAF7F0 0%, #FAF7F0 32%, rgba(250,247,240,0.92) 55%, rgba(250,247,240,0.55) 100%)",
+            }}
+          />
         </div>
 
         <div className="relative mx-auto flex min-h-[70dvh] max-w-6xl flex-col justify-end px-4 pb-10 pt-20 sm:min-h-[75dvh] sm:justify-center sm:px-6 sm:pb-16">
           <div className="max-w-xl">
-            <p className="animate-fade-up font-display text-sm font-medium tracking-[0.08em] text-terracotta">
+            <p className="animate-fade-up font-display text-sm font-medium tracking-[0.08em] text-[#C9856B]">
               FoodToura
             </p>
             <h1
-              className="animate-fade-up mt-3 font-display text-4xl font-semibold leading-[1.1] tracking-tight text-forest text-balance dark:text-cream sm:text-5xl"
+              className="animate-fade-up mt-3 font-display text-4xl font-semibold leading-[1.1] tracking-tight text-[#344E41] text-balance sm:text-5xl"
               style={{ animationDelay: "40ms" }}
             >
               A new city. A thousand restaurants. One perfect match.
             </h1>
             <p
-              className="animate-fade-up mt-4 max-w-md text-base leading-relaxed text-ink dark:text-cream/90 sm:text-lg"
+              className="animate-fade-up mt-4 max-w-md text-base leading-relaxed text-[#303A32] sm:text-lg"
               style={{ animationDelay: "80ms" }}
             >
               Tell us what you love, what you need and who you&apos;re traveling
@@ -122,7 +128,7 @@ export default function HomePage() {
               journey.
             </p>
             <div
-              className="animate-fade-up mt-7 rounded-3xl border border-mist/90 bg-card/95 p-4 shadow-soft backdrop-blur-sm dark:border-border dark:bg-card/95"
+              className="animate-fade-up mt-7 rounded-3xl border border-[#E8DFD0] bg-[#FFFDF9] p-4 shadow-soft"
               style={{ animationDelay: "120ms" }}
             >
               <LocationSearch />
@@ -141,7 +147,7 @@ export default function HomePage() {
               <p className="text-xs font-semibold uppercase tracking-wide text-ink-muted">
                 Current destination
               </p>
-              <p className="mt-1 font-display text-2xl font-semibold text-forest dark:text-cream">
+              <p className="mt-1 font-display text-2xl font-semibold text-forest">
                 {destination?.city
                   ? `${destination.city}${destination.country ? `, ${destination.country}` : ""}`
                   : "Where next?"}
@@ -196,7 +202,7 @@ export default function HomePage() {
 
         {/* Secondary tools — discovery stays hero-first */}
         <section>
-          <h2 className="font-display text-2xl font-semibold text-forest dark:text-cream">
+          <h2 className="font-display text-2xl font-semibold text-forest">
             Travel tools
           </h2>
           <p className="mt-1 text-sm text-ink-muted">
@@ -209,7 +215,7 @@ export default function HomePage() {
                 href={q.href}
                 className="card-surface block p-4 transition hover:-translate-y-0.5 hover:shadow-soft"
               >
-                <p className="font-semibold text-forest dark:text-cream">
+                <p className="font-semibold text-forest">
                   {q.title}
                 </p>
                 <p className="mt-1 text-sm text-ink-muted">{q.body}</p>
@@ -225,9 +231,9 @@ export default function HomePage() {
                 <Link
                   key={q.href}
                   href={q.href}
-                  className="rounded-2xl border border-mist/80 px-4 py-3 text-sm dark:border-white/10"
+                  className="rounded-2xl border border-mist/80 px-4 py-3 text-sm"
                 >
-                  <p className="font-semibold text-forest dark:text-cream">
+                  <p className="font-semibold text-forest">
                     {q.title}
                   </p>
                   <p className="text-ink-muted">{q.body}</p>
@@ -240,7 +246,7 @@ export default function HomePage() {
         {/* Personalized / local discoveries */}
         <section>
           <div className="flex items-end justify-between gap-3">
-            <h2 className="font-display text-2xl font-semibold text-forest dark:text-cream">
+            <h2 className="font-display text-2xl font-semibold text-forest">
               {destination?.city
                 ? `Local discoveries in ${destination.city}`
                 : "Sample discoveries"}
@@ -269,7 +275,7 @@ export default function HomePage() {
                   />
                 </div>
                 <div className="p-3">
-                  <p className="font-semibold text-forest dark:text-cream">
+                  <p className="font-semibold text-forest">
                     {r.name}
                   </p>
                   <p className="text-xs text-ink-muted">
@@ -283,7 +289,7 @@ export default function HomePage() {
 
         {/* Trending destinations */}
         <section>
-          <h2 className="font-display text-2xl font-semibold text-forest dark:text-cream">
+          <h2 className="font-display text-2xl font-semibold text-forest">
             Trending destinations
           </h2>
           <div className="mt-4 grid gap-4 sm:grid-cols-2">
@@ -314,7 +320,7 @@ export default function HomePage() {
         {/* Recently saved teaser */}
         <section className="card-surface flex items-center justify-between gap-4 p-5">
           <div>
-            <h2 className="font-display text-xl font-semibold text-forest dark:text-cream">
+            <h2 className="font-display text-xl font-semibold text-forest">
               Recently saved
             </h2>
             <p className="mt-1 text-sm text-ink-muted">

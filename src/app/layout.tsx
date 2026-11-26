@@ -26,31 +26,23 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" data-scroll-behavior="smooth" suppressHydrationWarning>
+    <html lang="en" data-scroll-behavior="smooth" className="light" style={{ colorScheme: "light" }}>
       <body
-        className={`${display.variable} ${sans.variable} font-sans antialiased text-ink`}
+        className={`${display.variable} ${sans.variable} bg-[#FAF7F0] font-sans text-[#303A32] antialiased`}
       >
-        {/* Light is default. Dark only when the user explicitly chose it. */}
+        {/* Force light theme — clear any stale dark preference from older builds */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{if(localStorage.getItem('foodtoura.theme')==='dark')document.documentElement.classList.add('dark');else document.documentElement.classList.remove('dark');}catch(e){}})();`,
+            __html: `(function(){try{document.documentElement.classList.remove('dark');document.documentElement.classList.add('light');document.documentElement.style.colorScheme='light';localStorage.setItem('foodtoura.theme','light');}catch(e){}})();`,
           }}
         />
-        <div className="relative min-h-dvh overflow-x-hidden bg-cream">
+        <div className="relative min-h-dvh overflow-x-hidden bg-[#FAF7F0]">
           <div
             aria-hidden
-            className="pointer-events-none absolute inset-0 -z-10 dark:hidden"
+            className="pointer-events-none absolute inset-0 -z-10"
             style={{
               background:
                 "radial-gradient(ellipse 80% 50% at 8% -8%, rgba(201,133,107,0.14), transparent 55%), radial-gradient(ellipse 55% 40% at 92% 0%, rgba(135,155,124,0.16), transparent 50%), #FAF7F0",
-            }}
-          />
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-0 -z-10 hidden dark:block"
-            style={{
-              background:
-                "radial-gradient(ellipse 70% 40% at 20% 0%, rgba(135,155,124,0.14), transparent 50%), #1C2420",
             }}
           />
           <SiteHeader />

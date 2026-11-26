@@ -38,7 +38,7 @@ export default function ExplorePage() {
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-12">
       <div className="max-w-2xl">
         <p className="text-sm font-medium text-terracotta">Explore</p>
-        <h1 className="mt-1 font-display text-3xl font-semibold text-forest dark:text-cream sm:text-4xl">
+        <h1 className="mt-1 font-display text-3xl font-semibold text-forest sm:text-4xl">
           Browse like a local
         </h1>
         <p className="mt-2 text-ink-soft">
@@ -104,7 +104,7 @@ export default function ExplorePage() {
               />
             </div>
             <div className="space-y-1 p-4">
-              <h2 className="font-display text-xl font-semibold text-forest dark:text-cream">
+              <h2 className="font-display text-xl font-semibold text-forest">
                 {r.name}
               </h2>
               <p className="text-sm text-ink-muted">

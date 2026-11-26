@@ -53,7 +53,7 @@ export function SafetyLevelPill({
   const map = {
     compatible: {
       label: "No reported conflicts",
-      className: "bg-forest text-cream",
+      className: "bg-forest text-white",
     },
     caution: {
       label: "Verify before dining",
@@ -61,7 +61,7 @@ export function SafetyLevelPill({
     },
     unknown: {
       label: "Allergen info incomplete",
-      className: "bg-charcoal-soft text-cream",
+      className: "bg-charcoal-soft text-white",
     },
     conflict: {
       label: "Allergy conflict",

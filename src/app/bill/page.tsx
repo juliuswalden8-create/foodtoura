@@ -22,7 +22,7 @@ export default function BillPage() {
   return (
     <div className="mx-auto max-w-md px-4 py-8 sm:px-6 sm:py-12">
       <p className="text-sm font-medium text-terracotta">Bill split</p>
-      <h1 className="mt-1 font-display text-3xl font-semibold text-forest dark:text-cream">
+      <h1 className="mt-1 font-display text-3xl font-semibold text-forest">
         Split the check
       </h1>
       <p className="mt-2 text-ink-soft">
@@ -67,12 +67,12 @@ export default function BillPage() {
             className="mt-2 w-full"
           />
         </label>
-        <div className="rounded-2xl bg-sand/60 p-4 text-sm dark:bg-white/5">
+        <div className="rounded-2xl bg-sand/60 p-4 text-sm">
           <p>Tip: €{tip.toFixed(2)}</p>
           <p className="mt-1 font-semibold">
             Total with tip: €{grand.toFixed(2)}
           </p>
-          <p className="mt-2 text-forest dark:text-cream">
+          <p className="mt-2 text-forest">
             Equal split: €{equal.toFixed(2)} / person
           </p>
         </div>

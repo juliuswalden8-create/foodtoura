@@ -59,7 +59,7 @@ function TripInner() {
   return (
     <div className="mx-auto max-w-xl px-4 py-8 sm:px-6 sm:py-12">
       <p className="text-sm font-medium text-terracotta">Shared trip</p>
-      <h1 className="mt-1 font-display text-3xl font-semibold text-forest dark:text-cream">
+      <h1 className="mt-1 font-display text-3xl font-semibold text-forest">
         {state.location.city || "Your journey"}
       </h1>
       <p className="mt-2 text-ink-soft">

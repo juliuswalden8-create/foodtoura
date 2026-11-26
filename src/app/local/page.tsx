@@ -39,7 +39,7 @@ export default function LocalPage() {
   return (
     <div className="mx-auto max-w-2xl px-4 py-8 sm:px-6 sm:py-12">
       <p className="text-sm font-medium text-terracotta">Eat Like a Local</p>
-      <h1 className="mt-1 font-display text-3xl font-semibold text-forest dark:text-cream">
+      <h1 className="mt-1 font-display text-3xl font-semibold text-forest">
         Dishes worth knowing
       </h1>
       <p className="mt-2 text-ink-soft">
@@ -61,7 +61,7 @@ export default function LocalPage() {
               <p className="text-xs font-medium text-terracotta">
                 {d.city} · {d.category}
               </p>
-              <h2 className="font-display text-2xl font-semibold text-forest dark:text-cream">
+              <h2 className="font-display text-2xl font-semibold text-forest">
                 {d.name}
               </h2>
               <p className="mt-2 text-sm text-ink-soft">{d.taste}</p>

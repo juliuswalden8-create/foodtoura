@@ -25,7 +25,7 @@ export default function JournalPage() {
   return (
     <div className="mx-auto max-w-xl px-4 py-8 sm:px-6 sm:py-12">
       <p className="text-sm font-medium text-terracotta">Food Passport</p>
-      <h1 className="mt-1 font-display text-3xl font-semibold text-forest dark:text-cream">
+      <h1 className="mt-1 font-display text-3xl font-semibold text-forest">
         Your food journal
       </h1>
       <p className="mt-2 text-ink-soft">
@@ -105,7 +105,7 @@ export default function JournalPage() {
           <li key={e.id} className="card-surface p-4">
             <div className="flex items-start justify-between gap-3">
               <div>
-                <p className="font-semibold text-forest dark:text-cream">
+                <p className="font-semibold text-forest">
                   {e.restaurantName}
                 </p>
                 <p className="text-xs text-ink-muted">

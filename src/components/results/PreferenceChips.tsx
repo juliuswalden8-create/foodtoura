@@ -27,7 +27,7 @@ export function PreferenceChips({
   }
 
   return (
-    <div className="space-y-3 rounded-2xl border border-mist/80 bg-cream/60 p-4 dark:border-white/10 dark:bg-white/5">
+    <div className="space-y-3 rounded-2xl border border-mist/80 bg-cream/60 p-4">
       <p className="text-xs font-semibold uppercase tracking-wide text-ink-muted">
         Edit preferences — results update live
       </p>

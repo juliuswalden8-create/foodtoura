@@ -97,7 +97,7 @@ export default function RestaurantDetailPage() {
   if (!ranked) {
     return (
       <div className="mx-auto max-w-xl px-4 py-16 text-center">
-        <h1 className="font-display text-3xl font-semibold text-forest dark:text-cream">
+        <h1 className="font-display text-3xl font-semibold text-forest">
           Restaurant not found
         </h1>
         <p className="mt-2 text-sm text-ink-muted">{error}</p>
@@ -131,7 +131,7 @@ export default function RestaurantDetailPage() {
             {ranked.city}
             {ranked.neighborhood ? ` · ${ranked.neighborhood}` : ""}
           </p>
-          <h1 className="mt-1 font-display text-3xl font-semibold text-forest dark:text-cream sm:text-4xl">
+          <h1 className="mt-1 font-display text-3xl font-semibold text-forest sm:text-4xl">
             {ranked.name}
           </h1>
           <p className="mt-2 text-ink-soft">
@@ -249,7 +249,7 @@ export default function RestaurantDetailPage() {
 
       {ranked.authenticityScore != null && (
         <section className="mt-6 card-surface p-5">
-          <h2 className="font-display text-lg font-semibold text-forest dark:text-cream">
+          <h2 className="font-display text-lg font-semibold text-forest">
             Authenticity estimate
           </h2>
           <p className="mt-1 text-sm text-ink-soft">
@@ -268,7 +268,7 @@ export default function RestaurantDetailPage() {
 
       {ranked.scoreExplain.length > 0 && (
         <section className="mt-6 card-surface p-5">
-          <h2 className="font-display text-lg font-semibold text-forest dark:text-cream">
+          <h2 className="font-display text-lg font-semibold text-forest">
             Why this score
           </h2>
           <p className="mt-1 text-xs text-ink-muted">
@@ -280,7 +280,7 @@ export default function RestaurantDetailPage() {
             ))}
           </ul>
           {ranked.matchScore != null && (
-            <p className="mt-3 text-sm font-semibold text-forest dark:text-cream">
+            <p className="mt-3 text-sm font-semibold text-forest">
               Match {ranked.matchScore}%
             </p>
           )}
@@ -300,14 +300,14 @@ export default function RestaurantDetailPage() {
 
       {ranked.allergens.length > 0 && (
         <section className="mt-6 card-surface p-5">
-          <h2 className="font-display text-lg font-semibold text-forest dark:text-cream">
+          <h2 className="font-display text-lg font-semibold text-forest">
             Allergen matrix
           </h2>
           <ul className="mt-3 grid gap-2 sm:grid-cols-2">
             {ranked.allergens.map((a) => (
               <li
                 key={a.allergen}
-                className="flex items-center justify-between gap-2 rounded-xl bg-sand/50 px-3 py-2 text-sm dark:bg-white/5"
+                className="flex items-center justify-between gap-2 rounded-xl bg-sand/50 px-3 py-2 text-sm"
               >
                 <span>{ALLERGEN_LABEL[a.allergen]}</span>
                 <span className="flex items-center gap-2 text-xs">

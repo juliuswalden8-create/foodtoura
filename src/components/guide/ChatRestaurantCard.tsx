@@ -27,7 +27,7 @@ export function ChatRestaurantCard({
     "A warm fit for what you described.";
 
   return (
-    <article className="overflow-hidden rounded-3xl border border-mist bg-card shadow-card dark:border-border">
+    <article className="overflow-hidden rounded-3xl border border-mist bg-card shadow-card">
       <div className="relative aspect-[16/10]">
         <Image
           src={restaurant.imageUrl}
@@ -40,7 +40,7 @@ export function ChatRestaurantCard({
       <div className="space-y-2.5 p-4">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <h3 className="font-display text-xl font-semibold text-forest dark:text-cream">
+            <h3 className="font-display text-xl font-semibold text-forest">
               {restaurant.name}
             </h3>
             <p className="text-xs text-ink-muted">
@@ -64,7 +64,7 @@ export function ChatRestaurantCard({
               : ""}
         </p>
         <p className="text-sm leading-relaxed text-ink-soft">
-          <span className="font-medium text-forest dark:text-cream">Why: </span>
+          <span className="font-medium text-forest">Why: </span>
           {why}
         </p>
         {restaurant.allergyWarnings[0] && (

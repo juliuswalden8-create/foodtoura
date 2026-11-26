@@ -63,7 +63,7 @@ export default function SavedPage() {
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 sm:py-12">
-      <h1 className="font-display text-3xl font-semibold text-forest dark:text-cream">
+      <h1 className="font-display text-3xl font-semibold text-forest">
         Saved
       </h1>
       <p className="mt-2 text-ink-soft">
@@ -98,7 +98,7 @@ export default function SavedPage() {
               <div className="min-w-0 flex-1 py-1">
                 <Link
                   href={`/restaurant/${r.id}`}
-                  className="font-display text-lg font-semibold text-forest dark:text-cream"
+                  className="font-display text-lg font-semibold text-forest"
                 >
                   {r.name}
                 </Link>

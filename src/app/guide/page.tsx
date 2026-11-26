@@ -339,13 +339,13 @@ function GuideInner() {
   return (
     <div className="relative mx-auto flex min-h-[calc(100dvh-8rem)] max-w-2xl flex-col pb-28">
       {/* Header */}
-      <div className="sticky top-0 z-20 border-b border-[#E8DFD0] bg-[#FAF7F0]/95 px-4 py-3 backdrop-blur-md dark:border-[#3a4540] dark:bg-[#1c2420]/95 sm:px-6">
+      <div className="sticky top-0 z-20 border-b border-[#E8DFD0] bg-[#FAF7F0]/95 px-4 py-3 backdrop-blur-md sm:px-6">
         <div className="flex items-center justify-between gap-3">
           <div>
             <p className="text-xs font-medium uppercase tracking-wide text-[#C9856B]">
               Your local guide
             </p>
-            <h1 className="font-display text-xl font-semibold text-[#344E41] dark:text-[#f4f1ea] sm:text-2xl">
+            <h1 className="font-display text-xl font-semibold text-[#344E41] sm:text-2xl">
               Let&apos;s find somewhere lovely.
             </h1>
           </div>
@@ -358,7 +358,7 @@ function GuideInner() {
           </button>
         </div>
         {liveHint && (
-          <p className="mt-2 text-[11px] leading-relaxed text-[#62675E] dark:text-[#a8aea6]">
+          <p className="mt-2 text-[11px] leading-relaxed text-[#62675E]">
             {liveHint} Allergy safety is always checked carefully.
           </p>
         )}
@@ -381,9 +381,9 @@ function GuideInner() {
                 sizes="672px"
                 priority
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-cream via-cream/20 to-transparent dark:from-[#1c2420]" />
+              <div className="absolute inset-0 bg-gradient-to-t from-cream via-cream/20 to-transparent" />
             </div>
-            <p className="font-display text-2xl font-semibold text-forest dark:text-cream">
+            <p className="font-display text-2xl font-semibold text-forest">
               Your personal food guide, wherever you are.
             </p>
             <p className="mt-2 text-sm text-ink-soft">
@@ -453,10 +453,10 @@ function GuideInner() {
       </div>
 
       {/* Composer — fixed above bottom nav */}
-      <div className="fixed inset-x-0 bottom-[calc(3.6rem+env(safe-area-inset-bottom))] z-40 border-t border-mist/80 bg-cream/95 px-3 py-3 backdrop-blur-md dark:border-border dark:bg-[#1c2420]/95 sm:px-6">
+      <div className="fixed inset-x-0 bottom-[calc(3.6rem+env(safe-area-inset-bottom))] z-40 border-t border-[#E8DFD0] bg-[#FAF7F0]/98 px-3 py-3 backdrop-blur-md sm:px-6">
         <form
           onSubmit={onSubmit}
-          className="mx-auto flex max-w-2xl items-end gap-2 rounded-3xl border border-mist bg-card p-2 shadow-soft dark:border-border"
+          className="mx-auto flex max-w-2xl items-end gap-2 rounded-3xl border border-[#E8DFD0] bg-[#FFFDF9] p-2 shadow-soft"
         >
           <label className="sr-only" htmlFor="guide-composer">
             Message your local guide
@@ -465,7 +465,7 @@ function GuideInner() {
             id="guide-composer"
             ref={inputRef}
             rows={1}
-            className="max-h-32 min-h-[44px] flex-1 resize-none bg-transparent px-3 py-2.5 text-sm text-ink outline-none placeholder:text-ink-muted dark:text-cream"
+            className="max-h-32 min-h-[44px] flex-1 resize-none bg-transparent px-3 py-2.5 text-sm text-[#303A32] outline-none placeholder:text-[#7A7F76]"
             placeholder="Tell me what you're craving…"
             value={draft}
             onChange={(e) => setDraft(e.target.value)}

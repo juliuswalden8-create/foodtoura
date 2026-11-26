@@ -85,7 +85,7 @@ export default function RecommendPage() {
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-12">
       <p className="text-sm font-medium text-terracotta">AI recommendations</p>
-      <h1 className="mt-1 font-display text-3xl font-semibold text-forest dark:text-cream sm:text-4xl">
+      <h1 className="mt-1 font-display text-3xl font-semibold text-forest sm:text-4xl">
         Explainable picks for your night
       </h1>
       <p className="mt-2 max-w-2xl text-ink-soft">
@@ -97,7 +97,7 @@ export default function RecommendPage() {
         <DemoModeBanner compact mode={dataMode} />
         <SafetyBanner compact />
         {error && (
-          <p className="rounded-2xl bg-red-50 px-3 py-2 text-sm text-red-800 dark:bg-red-950/40 dark:text-red-100">
+          <p className="rounded-2xl bg-red-50 px-3 py-2 text-sm text-red-800">
             {error}
           </p>
         )}
@@ -118,7 +118,7 @@ export default function RecommendPage() {
           {loading ? "Thinking…" : "Get recommendations"}
         </button>
         {notes.length > 0 && (
-          <ul className="rounded-2xl bg-forest/5 px-4 py-3 text-sm text-forest dark:bg-forest-mid/20 dark:text-cream">
+          <ul className="rounded-2xl bg-forest/5 px-4 py-3 text-sm text-forest">
             {notes.map((n) => (
               <li key={n}>· {n}</li>
             ))}
@@ -127,7 +127,7 @@ export default function RecommendPage() {
       </div>
 
       {hint && (
-        <p className="mt-4 max-w-2xl rounded-2xl border border-amber-300/50 bg-amber-50 px-4 py-3 text-sm text-amber-950 dark:bg-amber-950/30 dark:text-amber-100">
+        <p className="mt-4 max-w-2xl rounded-2xl border border-amber-300/50 bg-amber-50 px-4 py-3 text-sm text-amber-950">
           {hint}
         </p>
       )}

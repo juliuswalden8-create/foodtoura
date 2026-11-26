@@ -159,7 +159,7 @@ export default function ResultsPage() {
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-12">
       <div className="mb-6 max-w-2xl animate-fade-up">
         <p className="text-sm font-medium text-terracotta">For you tonight</p>
-        <h1 className="mt-1 font-display text-3xl font-semibold text-forest dark:text-cream sm:text-4xl">
+        <h1 className="mt-1 font-display text-3xl font-semibold text-forest sm:text-4xl">
           Restaurants for {state.location.city || "your destination"}
         </h1>
         <p className="mt-2 text-ink-soft">
@@ -225,13 +225,13 @@ export default function ResultsPage() {
           ))}
         </div>
         {noFullMatch && !loading && (
-          <div className="rounded-2xl border border-amber-300/60 bg-amber-50 px-4 py-3 text-sm text-amber-950 dark:border-amber-500/30 dark:bg-amber-950/30 dark:text-amber-100">
+          <div className="rounded-2xl border border-amber-300/60 bg-amber-50 px-4 py-3 text-sm text-amber-950">
             <p className="font-semibold">No perfect match</p>
             <p className="mt-1">{noFullMatch}</p>
           </div>
         )}
         {error && (
-          <div className="rounded-2xl border border-red-300/60 bg-red-50 px-4 py-3 text-sm text-red-900 dark:border-red-500/30 dark:bg-red-950/40 dark:text-red-100">
+          <div className="rounded-2xl border border-red-300/60 bg-red-50 px-4 py-3 text-sm text-red-900">
             <p className="font-semibold">Search issue</p>
             <p className="mt-1">{error}</p>
             <div className="mt-3 flex flex-wrap gap-2">
@@ -261,7 +261,7 @@ export default function ResultsPage() {
         </div>
       ) : results.length === 0 && !error ? (
         <div className="card-surface p-8 text-center">
-          <p className="font-display text-xl text-forest dark:text-cream">
+          <p className="font-display text-xl text-forest">
             No restaurants to show
           </p>
           <p className="mt-2 text-sm text-ink-soft">

@@ -63,7 +63,7 @@ export default function SurprisePage() {
   return (
     <div className="mx-auto max-w-lg px-4 py-8 sm:px-6">
       <p className="text-sm font-medium text-terracotta">Surprise Me</p>
-      <h1 className="mt-1 font-display text-3xl font-semibold text-forest dark:text-cream">
+      <h1 className="mt-1 font-display text-3xl font-semibold text-forest">
         One eligible pick
       </h1>
       <p className="mt-2 text-sm text-ink-soft">
@@ -77,7 +77,7 @@ export default function SurprisePage() {
 
       {pick ? (
         <div className="mt-6">
-          <p className="mb-3 text-sm text-forest dark:text-cream">
+          <p className="mb-3 text-sm text-forest">
             Why: {reason}
           </p>
           <RestaurantCard restaurant={pick} />

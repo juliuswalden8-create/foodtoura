@@ -71,7 +71,7 @@ export default function GroupMatchPage() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 sm:py-12">
       <p className="text-sm font-medium text-terracotta">Group Match</p>
-      <h1 className="mt-1 font-display text-3xl font-semibold text-forest dark:text-cream">
+      <h1 className="mt-1 font-display text-3xl font-semibold text-forest">
         Decide together
       </h1>
       <p className="mt-2 text-ink-soft">

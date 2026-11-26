@@ -32,7 +32,7 @@ export default function PlanPage() {
   return (
     <div className="mx-auto max-w-xl px-4 py-8 sm:px-6 sm:py-12">
       <p className="text-sm font-medium text-terracotta">Tonight&apos;s plan</p>
-      <h1 className="mt-1 font-display text-3xl font-semibold text-forest dark:text-cream">
+      <h1 className="mt-1 font-display text-3xl font-semibold text-forest">
         Build your evening
       </h1>
       <p className="mt-2 text-ink-soft">
@@ -84,13 +84,13 @@ export default function PlanPage() {
         )}
         {plan.stops.map((s, idx) => (
           <li key={s.restaurantId} className="card-surface flex gap-3 p-4">
-            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-forest text-sm font-semibold text-cream dark:bg-forest-mid">
+            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-forest text-sm font-semibold text-white">
               {idx + 1}
             </span>
             <div className="min-w-0 flex-1">
               <Link
                 href={`/restaurant/${s.restaurantId}`}
-                className="font-semibold text-forest dark:text-cream"
+                className="font-semibold text-forest"
               >
                 {s.name}
               </Link>
@@ -130,7 +130,7 @@ export default function PlanPage() {
         ))}
       </ol>
 
-      <h2 className="mt-8 font-display text-xl font-semibold text-forest dark:text-cream">
+      <h2 className="mt-8 font-display text-xl font-semibold text-forest">
         Add from saved
       </h2>
       <ul className="mt-3 space-y-2">
@@ -148,7 +148,7 @@ export default function PlanPage() {
           return (
             <li
               key={id}
-              className="flex items-center justify-between gap-3 rounded-2xl border border-mist px-4 py-3 dark:border-white/10"
+              className="flex items-center justify-between gap-3 rounded-2xl border border-mist px-4 py-3"
             >
               <span className="text-sm font-medium">{r.name}</span>
               <button
