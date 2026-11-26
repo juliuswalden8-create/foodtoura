@@ -78,17 +78,19 @@ export async function GET(req: NextRequest) {
     Math.max(100, Number(req.nextUrl.searchParams.get("h") || 800) || 800),
   );
 
-  // Rebuild path from validated IDs only — never interpolate raw input
+  // Rebuild path from validated IDs only — never interpolate raw input.
+  // skipHttpRedirect=true returns image bytes from Places (avoids CDN 302).
   const upstream = new URL(
     `https://places.googleapis.com/v1/places/${parsed.placeId}/photos/${parsed.photoId}/media`,
   );
   upstream.searchParams.set("maxHeightPx", String(maxHeightPx));
+  upstream.searchParams.set("skipHttpRedirect", "true");
   upstream.searchParams.set("key", key);
 
   try {
-    // Do not follow redirects (prevents open redirect / host jump)
     const res = await fetch(upstream.toString(), { redirect: "manual" });
     if (res.status >= 300 && res.status < 400) {
+      // Should not happen with skipHttpRedirect; refuse host jumps
       return NextResponse.json(
         { error: "Unexpected redirect from photo host" },
         { status: 502 },
@@ -100,8 +102,14 @@ export async function GET(req: NextRequest) {
         { status: 502 },
       );
     }
-    const buf = await res.arrayBuffer();
     const contentType = res.headers.get("content-type") || "image/jpeg";
+    if (!contentType.startsWith("image/")) {
+      return NextResponse.json(
+        { error: "Photo host returned non-image payload" },
+        { status: 502 },
+      );
+    }
+    const buf = await res.arrayBuffer();
     return new NextResponse(buf, {
       status: 200,
       headers: {

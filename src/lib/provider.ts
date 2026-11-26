@@ -340,13 +340,49 @@ class GooglePlacesProvider implements RestaurantProvider {
     );
     if (!res.ok) return null;
     const p = (await res.json()) as NonNullable<PlacesNewResult["places"]>[number];
-    return placeToRestaurant(p, "");
+    const parts = (p.formattedAddress || "").split(",").map((s) => s.trim());
+    const cityHint = parts.length >= 2 ? parts[parts.length - 2] : parts[0] || "";
+    return placeToRestaurant(p, cityHint);
+  }
+}
+
+/**
+ * Composite lookup: live Place IDs (`places-*`) use Google when keyed;
+ * demo inventory IDs always resolve from mock data so Explore/home links
+ * keep working after a live key is added. Search responses never mix modes.
+ */
+class CompositeRestaurantProvider implements RestaurantProvider {
+  mode: "demo" | "live";
+  private demo = new DemoRestaurantProvider();
+  private live: GooglePlacesProvider | null;
+
+  constructor() {
+    this.live = hasLiveKey() ? new GooglePlacesProvider() : null;
+    this.mode = this.live ? "live" : "demo";
+  }
+
+  async search(query: {
+    city?: string;
+    lat?: number;
+    lng?: number;
+    radiusKm?: number;
+    textQuery?: string;
+  }): Promise<ProviderResult> {
+    if (this.live) return this.live.search(query);
+    return this.demo.search(query);
+  }
+
+  async getById(id: string): Promise<Restaurant | null> {
+    if (id.startsWith("places-")) {
+      if (!this.live) return null;
+      return this.live.getById(id);
+    }
+    return this.demo.getById(id);
   }
 }
 
 export function getRestaurantProvider(): RestaurantProvider {
-  if (hasLiveKey()) return new GooglePlacesProvider();
-  return new DemoRestaurantProvider();
+  return new CompositeRestaurantProvider();
 }
 
 export function getDataMode(): "demo" | "live" {

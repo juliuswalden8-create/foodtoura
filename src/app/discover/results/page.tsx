@@ -37,7 +37,11 @@ function sortResults(
   const copy = [...list];
   switch (sort) {
     case "distance":
-      return copy.sort((a, b) => a.distanceKm - b.distanceKm);
+      return copy.sort((a, b) => {
+        const ad = a.distanceKm < 0 ? Number.POSITIVE_INFINITY : a.distanceKm;
+        const bd = b.distanceKm < 0 ? Number.POSITIVE_INFINITY : b.distanceKm;
+        return ad - bd;
+      });
     case "price":
       return copy.sort((a, b) => a.avgPricePerPerson - b.avgPricePerPerson);
     case "rating":
@@ -67,42 +71,88 @@ export default function ResultsPage() {
   const [copied, setCopied] = useState(false);
   const restoredScroll = useRef(false);
 
+  const refetchKeyRef = useRef("");
+
+  function materialQueryKey(s: DiscoveryState) {
+    return JSON.stringify({
+      city: s.location.city,
+      country: s.location.country,
+      neighborhood: s.location.neighborhood,
+      lat: s.location.lat,
+      lng: s.location.lng,
+      maxDistanceKm: s.location.maxDistanceKm,
+      cuisines: [...s.food.cuisines].sort(),
+    });
+  }
+
+  async function runDiscover(
+    loaded: DiscoveryState,
+    signal?: AbortSignal,
+  ) {
+    try {
+      setLoading(true);
+      setError(null);
+      const providerResult = await fetchDiscover(loaded, signal);
+      if (signal?.aborted) return;
+      setAttribution(providerResult.attribution);
+      setDataMode(providerResult.mode);
+      setRaw(providerResult.restaurants);
+      refetchKeyRef.current = materialQueryKey(loaded);
+      if (providerResult.restaurants.length === 0) {
+        setError(
+          providerResult.mode === "live"
+            ? "No live restaurants returned for this query. Try a broader city or cuisine."
+            : "No demo restaurants for this city. Try Barcelona or Lisbon, or set GOOGLE_PLACES_API_KEY for live data.",
+        );
+      }
+    } catch (e) {
+      if (signal?.aborted) return;
+      setError(
+        e instanceof Error
+          ? e.message
+          : "Search failed. Check your connection and try again.",
+      );
+      setRaw([]);
+    } finally {
+      if (!signal?.aborted) setLoading(false);
+    }
+  }
+
   useEffect(() => {
     const loaded = loadDiscoveryState();
     setState(loaded);
     setShareUrl(tripShareUrl(loaded));
 
     const ac = new AbortController();
-    (async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const providerResult = await fetchDiscover(loaded, ac.signal);
-        setAttribution(providerResult.attribution);
-        setDataMode(providerResult.mode);
-        setRaw(providerResult.restaurants);
-        if (providerResult.restaurants.length === 0) {
-          setError(
-            providerResult.mode === "live"
-              ? "No live restaurants returned for this query. Try a broader city or cuisine."
-              : "No demo restaurants for this city. Try Barcelona or Lisbon, or set GOOGLE_PLACES_API_KEY for live data.",
-          );
-        }
-      } catch (e) {
-        if (ac.signal.aborted) return;
-        setError(
-          e instanceof Error
-            ? e.message
-            : "Search failed. Check your connection and try again.",
-        );
-        setRaw([]);
-      } finally {
-        if (!ac.signal.aborted) setLoading(false);
-      }
-    })();
-
+    void runDiscover(loaded, ac.signal);
     return () => ac.abort();
+    // initial load only
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Debounced Places re-query when cuisine / location material fields change
+  useEffect(() => {
+    if (!state) return;
+    const key = materialQueryKey(state);
+    if (!refetchKeyRef.current || key === refetchKeyRef.current) return;
+    const ac = new AbortController();
+    const t = window.setTimeout(() => {
+      void runDiscover(state, ac.signal);
+    }, 400);
+    return () => {
+      window.clearTimeout(t);
+      ac.abort();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    state?.location.city,
+    state?.location.country,
+    state?.location.neighborhood,
+    state?.location.lat,
+    state?.location.lng,
+    state?.location.maxDistanceKm,
+    state?.food.cuisines?.join("|"),
+  ]);
 
   const results = useMemo(() => {
     if (!state) return [];

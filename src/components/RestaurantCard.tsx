@@ -78,8 +78,13 @@ export function RestaurantCard({
         </div>
 
         <p className="text-xs text-ink-muted">
-          {restaurant.neighborhood} · ~{restaurant.distanceKm} km straight-line
-          · avg €{restaurant.avgPricePerPerson}
+          {restaurant.neighborhood}
+          {restaurant.distanceKm >= 0
+            ? ` · ~${restaurant.distanceKm} km straight-line`
+            : " · distance unavailable"}
+          {restaurant.avgPricePerPerson
+            ? ` · avg €${restaurant.avgPricePerPerson}`
+            : ""}
         </p>
 
         {!compact && (

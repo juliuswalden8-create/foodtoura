@@ -3,7 +3,11 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { DemoModeBanner } from "@/components/DemoModeBanner";
-import { loadSavedIds } from "@/lib/discovery-store";
+import {
+  loadSavedIds,
+  loadSavedSnapshots,
+  type SavedSnapshot,
+} from "@/lib/discovery-store";
 import {
   addStop,
   loadItinerary,
@@ -14,11 +18,29 @@ import { getRestaurantById } from "@/lib/mock-restaurants";
 
 export default function PlanPage() {
   const [plan, setPlan] = useState<NightItinerary | null>(null);
-  const [saved, setSaved] = useState<string[]>([]);
+  const [savedPlaces, setSavedPlaces] = useState<
+    Array<{ id: string; name: string; city: string }>
+  >([]);
 
   useEffect(() => {
     setPlan(loadItinerary());
-    setSaved(loadSavedIds());
+    const ids = loadSavedIds();
+    const snaps = loadSavedSnapshots();
+    const byId = new Map<string, SavedSnapshot>(snaps.map((s) => [s.id, s]));
+    setSavedPlaces(
+      ids.map((id) => {
+        const snap = byId.get(id);
+        if (snap) {
+          return { id: snap.id, name: snap.name, city: snap.city };
+        }
+        const demo = getRestaurantById(id);
+        return {
+          id,
+          name: demo?.name || id,
+          city: demo?.city || "",
+        };
+      }),
+    );
   }, []);
 
   if (!plan) {
@@ -134,7 +156,7 @@ export default function PlanPage() {
         Add from saved
       </h2>
       <ul className="mt-3 space-y-2">
-        {saved.length === 0 && (
+        {savedPlaces.length === 0 && (
           <li className="text-sm text-ink-muted">
             Nothing saved yet.{" "}
             <Link href="/explore" className="text-terracotta underline">
@@ -142,35 +164,38 @@ export default function PlanPage() {
             </Link>
           </li>
         )}
-        {saved.map((id) => {
-          const r = getRestaurantById(id);
-          if (!r) return null;
-          return (
-            <li
-              key={id}
-              className="flex items-center justify-between gap-3 rounded-2xl border border-mist px-4 py-3"
+        {savedPlaces.map((r) => (
+          <li
+            key={r.id}
+            className="flex items-center justify-between gap-3 rounded-2xl border border-mist px-4 py-3"
+          >
+            <span className="text-sm font-medium">
+              {r.name}
+              {r.city ? (
+                <span className="ml-2 text-xs font-normal text-ink-muted">
+                  {r.city}
+                </span>
+              ) : null}
+            </span>
+            <button
+              type="button"
+              className="btn-secondary !py-2 text-xs"
+              onClick={() =>
+                setPlan(
+                  addStop(plan, {
+                    restaurantId: r.id,
+                    name: r.name,
+                    city: r.city,
+                    time: "20:00",
+                    note: "",
+                  }),
+                )
+              }
             >
-              <span className="text-sm font-medium">{r.name}</span>
-              <button
-                type="button"
-                className="btn-secondary !py-2 text-xs"
-                onClick={() =>
-                  setPlan(
-                    addStop(plan, {
-                      restaurantId: r.id,
-                      name: r.name,
-                      city: r.city,
-                      time: "20:00",
-                      note: "",
-                    }),
-                  )
-                }
-              >
-                Add
-              </button>
-            </li>
-          );
-        })}
+              Add
+            </button>
+          </li>
+        ))}
       </ul>
     </div>
   );

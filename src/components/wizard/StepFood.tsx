@@ -29,6 +29,8 @@ export function StepFood({
   onParsedDietary,
   onParsedGuests,
   onParsedCity,
+  onParsedDistance,
+  onParsedKids,
 }: {
   value: DiscoveryState["food"];
   onChange: (next: DiscoveryState["food"]) => void;
@@ -36,6 +38,8 @@ export function StepFood({
   onParsedDietary?: (dietary: DiscoveryState["dietary"]) => void;
   onParsedGuests?: (adults: number) => void;
   onParsedCity?: (city: string) => void;
+  onParsedDistance?: (maxDistanceKm: number) => void;
+  onParsedKids?: (children: number, infants: number) => void;
 }) {
   const [parsing, setParsing] = useState(false);
   const [notes, setNotes] = useState<string[]>([]);
@@ -64,12 +68,28 @@ export function StepFood({
         livelyAtmosphere: parsed.livelyAtmosphere ?? value.livelyAtmosphere,
         maxBudgetPerPerson:
           parsed.maxBudgetPerPerson ?? value.maxBudgetPerPerson,
+        atmosphere: parsed.atmosphere?.length
+          ? Array.from(
+              new Set([...(value.atmosphere || []), ...parsed.atmosphere]),
+            )
+          : value.atmosphere,
+        seating: parsed.seating?.length
+          ? Array.from(new Set([...(value.seating || []), ...parsed.seating]))
+          : value.seating,
+        accessibilityNeeds:
+          parsed.accessibilityNeeds ?? value.accessibilityNeeds,
+        wheelchairAccessible:
+          parsed.accessibilityNeeds ?? value.wheelchairAccessible,
         parsedNotes: parsed.notes,
       });
       if (parsed.allergens.length) onParsedAllergens?.(parsed.allergens);
       if (parsed.dietary.length) onParsedDietary?.(parsed.dietary);
       if (parsed.partySize) onParsedGuests?.(parsed.partySize);
       if (parsed.city) onParsedCity?.(parsed.city);
+      if (parsed.maxDistanceKm != null) onParsedDistance?.(parsed.maxDistanceKm);
+      if (parsed.children != null || parsed.infants != null) {
+        onParsedKids?.(parsed.children ?? 0, parsed.infants ?? 0);
+      }
       setNotes(parsed.notes);
     } finally {
       setParsing(false);

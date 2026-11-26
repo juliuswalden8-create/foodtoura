@@ -6,6 +6,7 @@ import Link from "next/link";
 import type { RankedRestaurant, ResultsViewMode } from "@/lib/types";
 import { RestaurantCard } from "@/components/RestaurantCard";
 import { SafetyLevelPill } from "@/components/SafetyBanner";
+import { toggleSaved } from "@/lib/discovery-store";
 
 export function ViewModeToggle({
   mode,
@@ -99,8 +100,8 @@ export function MapResults({ results }: { results: RankedRestaurant[] }) {
                   {r.name}
                 </p>
                 <p className="text-xs text-ink-muted">
-                  {r.cuisine[0]} · ★ {r.rating} · {"€".repeat(r.priceLevel)} ·{" "}
-                  {r.distanceKm} km
+                  {r.cuisine[0]} · ★ {r.rating} · {"€".repeat(r.priceLevel)}
+                  {r.distanceKm >= 0 ? ` · ${r.distanceKm} km` : ""}
                 </p>
               </div>
               <SafetyLevelPill level={r.safetyLevel} />
@@ -152,21 +153,8 @@ export function SwipeResults({ results }: { results: RankedRestaurant[] }) {
           type="button"
           className="flex h-14 w-14 items-center justify-center rounded-full bg-terracotta text-lg text-white shadow-soft"
           onClick={() => {
-            setSaved((s) =>
-              s.includes(current.id) ? s : [...s, current.id],
-            );
-            try {
-              const raw = localStorage.getItem("foodtoura.saved.v1");
-              const ids: string[] = raw ? JSON.parse(raw) : [];
-              if (!ids.includes(current.id)) {
-                localStorage.setItem(
-                  "foodtoura.saved.v1",
-                  JSON.stringify([...ids, current.id]),
-                );
-              }
-            } catch {
-              /* ignore */
-            }
+            const ids = toggleSaved(current.id, current);
+            setSaved(ids);
             next();
           }}
           aria-label="Save"

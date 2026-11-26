@@ -105,6 +105,22 @@ export default function DiscoverPage() {
                 location: { ...s.location, city: s.location.city || city },
               }))
             }
+            onParsedDistance={(maxDistanceKm) =>
+              setState((s) => ({
+                ...s,
+                location: { ...s.location, maxDistanceKm },
+              }))
+            }
+            onParsedKids={(children, infants) =>
+              setState((s) => ({
+                ...s,
+                guests: {
+                  ...s.guests,
+                  children: Math.max(s.guests.children, children),
+                  infants: Math.max(s.guests.infants, infants),
+                },
+              }))
+            }
           />
         )}
         {step === 4 && (

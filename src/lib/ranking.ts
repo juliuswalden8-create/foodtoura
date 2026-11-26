@@ -24,17 +24,36 @@ function haversineKm(
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
-function cityCenter(city: string): { lat: number; lng: number } {
-  const centers: Record<string, { lat: number; lng: number }> = {
-    Barcelona: { lat: 41.3874, lng: 2.1686 },
-    Lisbon: { lat: 38.7223, lng: -9.1393 },
-    Madrid: { lat: 40.4168, lng: -3.7038 },
-    Marbella: { lat: 36.5101, lng: -4.8825 },
-    Paris: { lat: 48.8566, lng: 2.3522 },
-    Rome: { lat: 41.9028, lng: 12.4964 },
-    London: { lat: 51.5074, lng: -0.1278 },
-  };
-  return centers[city] ?? centers.Barcelona;
+const CITY_CENTERS: Record<string, { lat: number; lng: number }> = {
+  Barcelona: { lat: 41.3874, lng: 2.1686 },
+  Lisbon: { lat: 38.7223, lng: -9.1393 },
+  Madrid: { lat: 40.4168, lng: -3.7038 },
+  Marbella: { lat: 36.5101, lng: -4.8825 },
+  Valencia: { lat: 39.4699, lng: -0.3763 },
+  Seville: { lat: 37.3891, lng: -5.9845 },
+  Malaga: { lat: 36.7213, lng: -4.4214 },
+  Porto: { lat: 41.1579, lng: -8.6291 },
+  Paris: { lat: 48.8566, lng: 2.3522 },
+  Lyon: { lat: 45.764, lng: 4.8357 },
+  Rome: { lat: 41.9028, lng: 12.4964 },
+  Milan: { lat: 45.4642, lng: 9.19 },
+  Florence: { lat: 43.7696, lng: 11.2558 },
+  London: { lat: 51.5074, lng: -0.1278 },
+  Berlin: { lat: 52.52, lng: 13.405 },
+  Amsterdam: { lat: 52.3676, lng: 4.9041 },
+  Tokyo: { lat: 35.6762, lng: 139.6503 },
+  "New York": { lat: 40.7128, lng: -74.006 },
+};
+
+function resolveOrigin(
+  city: string,
+  lat?: number,
+  lng?: number,
+): { lat: number; lng: number } | null {
+  if (lat != null && lng != null && !(lat === 0 && lng === 0)) {
+    return { lat, lng };
+  }
+  return CITY_CENTERS[city] ?? null;
 }
 
 function evaluateAllergy(
@@ -49,18 +68,17 @@ function evaluateAllergy(
   let hasConflict = false;
   let hasUnknown = false;
   let hasCaution = false;
+  const medicalSelected = selected.filter((s) => s.severity !== "preference");
+  let unavailableCount = 0;
 
-  for (const sel of selected) {
-    if (sel.severity === "preference") continue;
+  for (const sel of medicalSelected) {
     const status = restaurant.allergens.find((a) => a.allergen === sel.allergen);
     const label = ALLERGEN_SHORT[sel.allergen];
     const isMedical = sel.severity === "allergy";
 
     if (!status || status.source === "unavailable" || status.present === null) {
       hasUnknown = true;
-      warnings.push(
-        `${label}: information unavailable — verify directly with the restaurant.`,
-      );
+      unavailableCount += 1;
       continue;
     }
 
@@ -87,6 +105,26 @@ function evaluateAllergy(
     }
   }
 
+  // Collapse Places-style "all unavailable" noise into one venue notice
+  if (
+    unavailableCount > 0 &&
+    unavailableCount === medicalSelected.length &&
+    !hasConflict
+  ) {
+    warnings.unshift(
+      "No EU allergen matrix for this venue — verify every flagged allergy directly with the restaurant.",
+    );
+  } else if (unavailableCount > 0) {
+    for (const sel of medicalSelected) {
+      const status = restaurant.allergens.find((a) => a.allergen === sel.allergen);
+      if (!status || status.source === "unavailable" || status.present === null) {
+        warnings.push(
+          `${ALLERGEN_SHORT[sel.allergen]}: information unavailable — verify directly with the restaurant.`,
+        );
+      }
+    }
+  }
+
   let safetyLevel: RankedRestaurant["safetyLevel"] = "compatible";
   if (hasConflict) safetyLevel = "conflict";
   else if (hasUnknown) safetyLevel = "unknown";
@@ -106,10 +144,11 @@ export function rankRestaurants(
   state: DiscoveryState,
   taste?: TasteProfile,
 ): RankedRestaurant[] {
-  const center =
-    state.location.lat != null && state.location.lng != null
-      ? { lat: state.location.lat, lng: state.location.lng }
-      : cityCenter(state.location.city || "Barcelona");
+  const origin = resolveOrigin(
+    state.location.city,
+    state.location.lat,
+    state.location.lng,
+  );
 
   const partySize =
     state.guests.adults + state.guests.children + state.guests.infants;
@@ -143,7 +182,11 @@ export function rankRestaurants(
       let hardExcluded = false;
       let conflictExplanation: string | undefined;
 
-      const distanceKm = haversineKm(center.lat, center.lng, r.lat, r.lng);
+      const distanceKm =
+        origin && r.lat && r.lng
+          ? haversineKm(origin.lat, origin.lng, r.lat, r.lng)
+          : 0;
+      const distanceKnown = Boolean(origin && r.lat && r.lng);
       const allergy = evaluateAllergy(r, state.allergens);
 
       // Allergen safety is NEVER folded into match %
@@ -166,17 +209,17 @@ export function rankRestaurants(
         missingDataFlags.push("Many allergen fields unavailable");
       }
 
-      // Distance
-      if (distanceKm <= state.location.maxDistanceKm) {
+      // Distance — never invent from Barcelona when city/coords unknown
+      if (!distanceKnown) {
+        missingDataFlags.push("Distance unavailable — set location or GPS");
+        scoreExplain.push("Distance unavailable (no origin)");
+      } else if (distanceKm <= state.location.maxDistanceKm) {
         softScore += Math.max(0, 14 - distanceKm * 1.4);
-        matchReasons.push(`${distanceKm.toFixed(1)} km away`);
+        matchReasons.push(`${distanceKm.toFixed(1)} km straight-line`);
         scoreExplain.push(`Within ${state.location.maxDistanceKm} km (+)`);
       } else {
         softScore -= 16;
         scoreExplain.push(`Outside max distance (−)`);
-        if (mandatory.city) {
-          // soft — distance not mandatory unless we add it
-        }
       }
 
       // Neighborhood
@@ -379,7 +422,7 @@ export function rankRestaurants(
         safetyLevel: hardExcluded && allergy.safetyLevel === "compatible"
           ? "caution"
           : allergy.safetyLevel,
-        distanceKm: Math.round(distanceKm * 10) / 10,
+        distanceKm: distanceKnown ? Math.round(distanceKm * 10) / 10 : -1,
         missingDataFlags: Array.from(new Set(missingDataFlags)),
         conflictExplanation,
         scoreExplain,

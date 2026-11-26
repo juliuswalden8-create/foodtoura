@@ -5,22 +5,51 @@ import Link from "next/link";
 import Image from "next/image";
 import { DemoModeBanner } from "@/components/DemoModeBanner";
 import { SafetyBanner } from "@/components/SafetyBanner";
+import { fetchDiscover } from "@/lib/discover-client";
 import { loadDiscoveryState } from "@/lib/discovery-store";
 import { loadVotes, saveVotes, tally, type VoteBoard } from "@/lib/group-vote";
-import { RESTAURANTS } from "@/lib/mock-restaurants";
 import { rankRestaurants } from "@/lib/ranking";
+import type { Restaurant } from "@/lib/types";
 
 export default function VotePage() {
   const [board, setBoard] = useState<VoteBoard | null>(null);
-  const [ids, setIds] = useState<string[]>([]);
+  const [deck, setDeck] = useState<Restaurant[]>([]);
+  const [dataMode, setDataMode] = useState<"demo" | "live">("demo");
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const state = loadDiscoveryState();
-    const ranked = rankRestaurants(RESTAURANTS, state).slice(0, 8);
-    setIds(ranked.map((r) => r.id));
     const v = loadVotes();
     if (!v.city && state.location.city) v.city = state.location.city;
     setBoard(v);
+
+    const ac = new AbortController();
+    (async () => {
+      try {
+        setLoading(true);
+        const result = await fetchDiscover(state, ac.signal);
+        if (ac.signal.aborted) return;
+        setDataMode(result.mode);
+        const ranked = rankRestaurants(result.restaurants, state).slice(0, 8);
+        setDeck(ranked);
+        setError(
+          ranked.length === 0
+            ? "No restaurants to vote on for this search. Refine discovery first."
+            : null,
+        );
+      } catch (e) {
+        if (ac.signal.aborted) return;
+        setError(
+          e instanceof Error ? e.message : "Could not load restaurants to vote on.",
+        );
+        setDeck([]);
+      } finally {
+        if (!ac.signal.aborted) setLoading(false);
+      }
+    })();
+
+    return () => ac.abort();
   }, []);
 
   const scores = useMemo(
@@ -29,10 +58,12 @@ export default function VotePage() {
   );
 
   const ordered = useMemo(() => {
-    return [...ids].sort((a, b) => (scores[b] || 0) - (scores[a] || 0));
-  }, [ids, scores]);
+    return [...deck].sort(
+      (a, b) => (scores[b.id] || 0) - (scores[a.id] || 0),
+    );
+  }, [deck, scores]);
 
-  if (!board) {
+  if (!board || loading) {
     return (
       <div className="mx-auto max-w-xl px-4 py-16">
         <div className="skeleton h-40 w-full" />
@@ -56,14 +87,23 @@ export default function VotePage() {
         Pick a winner together
       </h1>
       <p className="mt-2 text-ink-soft">
-        Yes / maybe / no on your current matches. Scores stay on this device
-        for the demo — sync later with accounts.
+        Yes / maybe / no on your current matches. Scores stay on this device —
+        multi-device sync needs a shared database (not connected yet).
       </p>
 
       <div className="mt-4 space-y-3">
-        <DemoModeBanner compact />
+        <DemoModeBanner compact mode={dataMode} />
         <SafetyBanner compact />
       </div>
+
+      {error && (
+        <div className="mt-4 rounded-2xl border border-amber-300/60 bg-amber-50 px-4 py-3 text-sm text-amber-950">
+          {error}{" "}
+          <Link href="/discover/results" className="underline">
+            Open results
+          </Link>
+        </div>
+      )}
 
       <label className="mt-6 block text-sm font-medium">
         Your name
@@ -79,12 +119,10 @@ export default function VotePage() {
       </label>
 
       <ul className="mt-6 space-y-4">
-        {ordered.map((id) => {
-          const r = RESTAURANTS.find((x) => x.id === id);
-          if (!r) return null;
-          const current = board.votes[id];
+        {ordered.map((r) => {
+          const current = board.votes[r.id];
           return (
-            <li key={id} className="card-surface overflow-hidden">
+            <li key={r.id} className="card-surface overflow-hidden">
               <div className="flex gap-3 p-3">
                 <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-2xl">
                   <Image
@@ -103,7 +141,7 @@ export default function VotePage() {
                     {r.name}
                   </Link>
                   <p className="text-xs text-ink-muted">
-                    {r.cuisine[0]} · ★ {r.rating} · score {scores[id] || 0}
+                    {r.cuisine[0]} · ★ {r.rating} · score {scores[r.id] || 0}
                     {r.authenticityScore != null
                       ? ` · authenticity ~${r.authenticityScore}`
                       : ""}
@@ -122,7 +160,7 @@ export default function VotePage() {
                         className={`chip text-xs ${
                           current === v ? "chip-active" : "chip-idle"
                         }`}
-                        onClick={() => vote(id, v)}
+                        onClick={() => vote(r.id, v)}
                       >
                         {label}
                       </button>
@@ -137,10 +175,7 @@ export default function VotePage() {
 
       {ordered[0] && (
         <p className="mt-6 text-sm text-forest">
-          Current leader:{" "}
-          <strong>
-            {RESTAURANTS.find((r) => r.id === ordered[0])?.name || "—"}
-          </strong>
+          Current leader: <strong>{ordered[0].name}</strong>
         </p>
       )}
     </div>

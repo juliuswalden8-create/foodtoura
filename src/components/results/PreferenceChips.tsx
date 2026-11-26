@@ -29,7 +29,8 @@ export function PreferenceChips({
   return (
     <div className="space-y-3 rounded-2xl border border-mist/80 bg-cream/60 p-4">
       <p className="text-xs font-semibold uppercase tracking-wide text-ink-muted">
-        Edit preferences — results update live
+        Edit preferences — soft filters re-rank instantly; cuisine &amp; place
+        re-query the catalog
       </p>
       <div className="flex flex-wrap gap-2">
         {state.location.city && (
