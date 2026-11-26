@@ -32,10 +32,13 @@ const TRENDING = [
 const QUICK = [
   { href: "/guide", title: "AI Guide", body: "Describe dinner in plain language" },
   { href: "/group", title: "Group Match", body: "Merge everyone's prefs safely" },
+  { href: "/vote", title: "Group vote", body: "Yes / maybe / no on matches" },
   { href: "/recommend", title: "AI picks", body: "Explainable recommendations" },
   { href: "/passport", title: "Allergy Passport", body: "Show staff in their language" },
+  { href: "/phrases", title: "Phrase book", body: "Tell the kitchen clearly" },
   { href: "/scanner", title: "Menu Scanner", body: "Flag allergens in a menu" },
-  { href: "/explore", title: "Explore", body: "Browse demo cities & cuisines" },
+  { href: "/plan", title: "Tonight's plan", body: "Stack stops for the evening" },
+  { href: "/trip", title: "Share trip", body: "Send prefs as a link" },
 ];
 
 export default function HomePage() {

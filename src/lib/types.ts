@@ -163,6 +163,10 @@ export interface Restaurant {
   dataCompleteness: number; // 0–1
   attribution?: string;
   providerId?: string;
+  /** 0–100 local authenticity estimate (heuristic / partner feed later) */
+  authenticityScore?: number;
+  touristTrapRisk?: "low" | "medium" | "high";
+  authenticityNotes?: string;
 }
 
 export type SafetyLevel = "compatible" | "caution" | "unknown" | "conflict";

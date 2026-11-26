@@ -58,6 +58,18 @@ export default function ProfilePage() {
         <Link href="/recommend" className="btn-secondary">
           AI picks
         </Link>
+        <Link href="/vote" className="btn-secondary">
+          Group vote
+        </Link>
+        <Link href="/plan" className="btn-secondary">
+          Tonight&apos;s plan
+        </Link>
+        <Link href="/phrases" className="btn-secondary">
+          Phrase book
+        </Link>
+        <Link href="/trip" className="btn-secondary">
+          Share trip
+        </Link>
       </div>
     </div>
   );

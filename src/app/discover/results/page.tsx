@@ -14,6 +14,7 @@ import {
 import { loadDiscoveryState } from "@/lib/discovery-store";
 import { searchRestaurantsForState } from "@/lib/provider";
 import { describeNoFullMatch, rankRestaurants } from "@/lib/ranking";
+import { tripShareUrl } from "@/lib/share-trip";
 import type { RankedRestaurant, ResultsViewMode } from "@/lib/types";
 
 export default function ResultsPage() {
@@ -24,10 +25,13 @@ export default function ResultsPage() {
   const [mode, setMode] = useState<ResultsViewMode>("list");
   const [attribution, setAttribution] = useState("");
   const [noFullMatch, setNoFullMatch] = useState<string | null>(null);
+  const [shareUrl, setShareUrl] = useState("");
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     const state = loadDiscoveryState();
     setCity(state.location.city || "your destination");
+    setShareUrl(tripShareUrl(state));
     const party =
       state.guests.adults + state.guests.children + state.guests.infants;
     const cuisineBit =
@@ -81,6 +85,20 @@ export default function ResultsPage() {
           <Link href="/discover" className="btn-secondary !py-2.5 text-xs">
             Wizard
           </Link>
+          <Link href="/vote" className="btn-secondary !py-2.5 text-xs">
+            Group vote
+          </Link>
+          <button
+            type="button"
+            className="btn-secondary !py-2.5 text-xs"
+            onClick={async () => {
+              if (!shareUrl) return;
+              await navigator.clipboard.writeText(shareUrl);
+              setCopied(true);
+            }}
+          >
+            {copied ? "Link copied" : "Share trip"}
+          </button>
           <ViewModeToggle mode={mode} onChange={setMode} />
         </div>
       </div>

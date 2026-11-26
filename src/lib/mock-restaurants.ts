@@ -1,4 +1,5 @@
 import type { Restaurant } from "./types";
+import { enrichAuthenticity } from "./authenticity";
 
 const img = {
   tapas:
@@ -98,7 +99,7 @@ function normalizeDemo(r: DemoSeed): Restaurant {
     0.35,
     Math.min(1, 1 - unavailable / 28 + (r.reviewCount > 800 ? 0.1 : 0)),
   );
-  return {
+  return enrichAuthenticity({
     ...r,
     openNow: r.openNow ?? true,
     country: r.country ?? (r.city === "Lisbon" ? "Portugal" : "Spain"),
@@ -108,7 +109,7 @@ function normalizeDemo(r: DemoSeed): Restaurant {
     wheelchairAccessible:
       r.wheelchairAccessible ?? Boolean(r.childFriendly || r.acceptsLargeGroups),
     dataCompleteness: r.dataCompleteness ?? completeness,
-  };
+  });
 }
 
 const DEMO_SEEDS: DemoSeed[] = [

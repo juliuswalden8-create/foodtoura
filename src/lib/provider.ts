@@ -6,6 +6,7 @@ import type {
   RestaurantAllergenStatus,
 } from "./types";
 import { RESTAURANTS } from "./mock-restaurants";
+import { enrichAuthenticity } from "./authenticity";
 
 /**
  * Restaurant data provider abstraction.
@@ -285,7 +286,8 @@ class GooglePlacesProvider implements RestaurantProvider {
     const data = (await res.json()) as PlacesNewResult;
     const restaurants = (data.places || [])
       .map((p) => placeToRestaurant(p, query.city || ""))
-      .filter((r): r is Restaurant => Boolean(r));
+      .filter((r): r is Restaurant => Boolean(r))
+      .map(enrichAuthenticity);
 
     const result: ProviderResult = {
       mode: "live",

@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { RankedRestaurant } from "@/lib/types";
+import { authenticityLabel } from "@/lib/authenticity";
 import { SafetyLevelPill } from "./SafetyBanner";
 
 export function RestaurantCard({
@@ -71,6 +72,12 @@ export function RestaurantCard({
 
         <div className="flex flex-wrap gap-2">
           <SafetyLevelPill level={restaurant.safetyLevel} />
+          {restaurant.authenticityScore != null && (
+            <span className="rounded-full bg-sand px-2.5 py-1 text-[11px] font-medium text-charcoal-soft dark:bg-white/10 dark:text-cream">
+              {authenticityLabel(restaurant.authenticityScore)}
+              {restaurant.touristTrapRisk === "high" ? " · trap risk" : ""}
+            </span>
+          )}
         </div>
 
         {restaurant.matchReasons[0] && (

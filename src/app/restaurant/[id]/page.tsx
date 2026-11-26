@@ -10,6 +10,8 @@ import {
   loadSavedIds,
   toggleSaved,
 } from "@/lib/discovery-store";
+import { authenticityLabel } from "@/lib/authenticity";
+import { addStop, loadItinerary } from "@/lib/itinerary";
 import { getRestaurantById, RESTAURANTS } from "@/lib/mock-restaurants";
 import { rankRestaurants } from "@/lib/ranking";
 import { DetailSkeleton } from "@/components/Skeleton";
@@ -121,6 +123,21 @@ export default function RestaurantDetailPage() {
             >
               {saved ? "Saved ♥" : "Save"}
             </button>
+            <button
+              type="button"
+              className="btn-secondary !py-2 text-xs"
+              onClick={() => {
+                addStop(loadItinerary(), {
+                  restaurantId: ranked.id,
+                  name: ranked.name,
+                  city: ranked.city,
+                  time: "20:00",
+                  note: "",
+                });
+              }}
+            >
+              Add to tonight
+            </button>
           </div>
         </div>
 
@@ -147,6 +164,25 @@ export default function RestaurantDetailPage() {
         <DemoModeBanner compact />
         <SafetyBanner />
       </div>
+
+      {ranked.authenticityScore != null && (
+        <section className="mt-6 card-surface p-5">
+          <h2 className="font-display text-lg font-semibold text-forest dark:text-cream">
+            Authenticity estimate
+          </h2>
+          <p className="mt-1 text-sm text-ink-soft">
+            {authenticityLabel(ranked.authenticityScore)} · score{" "}
+            {ranked.authenticityScore}
+            {ranked.touristTrapRisk
+              ? ` · tourist-trap risk: ${ranked.touristTrapRisk}`
+              : ""}
+          </p>
+          <p className="mt-2 text-xs text-ink-muted">
+            {ranked.authenticityNotes ||
+              "Heuristic only — not a verified local guide rating."}
+          </p>
+        </section>
+      )}
 
       {ranked.scoreExplain.length > 0 && (
         <section className="mt-6 card-surface p-5">

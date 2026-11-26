@@ -296,6 +296,17 @@ export function rankRestaurants(
         `Rating ${r.rating} · reviews ${r.reviewReliability} · data ${Math.round(r.dataCompleteness * 100)}%`,
       );
 
+      // Authenticity preference (soft — never allergy-related)
+      if (r.authenticityScore != null) {
+        softScore += Math.round((r.authenticityScore - 50) / 10);
+        if (r.touristTrapRisk === "low") {
+          matchReasons.push("Lower tourist-trap risk (estimate)");
+          scoreExplain.push(`Authenticity ~${r.authenticityScore} (+)`);
+        } else if (r.touristTrapRisk === "high") {
+          scoreExplain.push(`Tourist-trap risk high · authenticity ~${r.authenticityScore} (−)`);
+        }
+      }
+
       if (
         allergy.safetyLevel === "compatible" &&
         state.allergens.some((a) => a.severity !== "preference")
