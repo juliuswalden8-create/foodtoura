@@ -101,9 +101,21 @@ export default function HomePage() {
               className="animate-fade-up mt-4 max-w-md text-base leading-relaxed text-ink-soft dark:text-ink-muted sm:text-lg"
               style={{ animationDelay: "80ms" }}
             >
-              Cut through unknown menus, group prefs, allergy risk, and tourist
-              traps. Personalized discovery for your journey.
+              Tell us what you love, what you need and who you&apos;re traveling
+              with. We&apos;ll help you discover restaurants that fit your
+              journey.
             </p>
+            <div
+              className="animate-fade-up mt-7 flex flex-wrap gap-3"
+              style={{ animationDelay: "120ms" }}
+            >
+              <Link href="/guide" className="btn-primary">
+                Find my perfect restaurant
+              </Link>
+              <Link href="/discover" className="btn-secondary">
+                Guided wizard
+              </Link>
+            </div>
           </div>
         </div>
       </section>
