@@ -12,8 +12,9 @@ Last updated: 2026-11-26
 | Explainable ranking | Working with limitations | Deterministic; allergies fail-closed | — |
 | Results List / Map / Swipe | Working with limitations | Map is coordinate plot, not Mapbox | Mapbox optional |
 | Results sort + editable chips | Working with limitations | Client re-rank; no Places re-query on chip | — |
-| Google Places live search | Blocked by external dependency | Provider ready; needs billing key | `GOOGLE_PLACES_API_KEY` |
+| Google Places live search | Blocked by external dependency | UI uses `POST /api/discover` (server-side key); needs billing key | `GOOGLE_PLACES_API_KEY` |
 | Places photos (no key leak) | Working with limitations | Proxied via `/api/places/photo` | Same key |
+| Restaurant detail (live IDs) | Working with limitations | `GET /api/restaurants/[id]` + saved snapshots | Same key |
 | Restaurant detail | Working with limitations | Demo rich; live sparse + unavailable allergens | — |
 | Save restaurants | Working with limitations | localStorage guest; no account sync | Auth/DB later |
 | Group Match merge | Demo only | Single-device merge → search | DB for multi-user |
