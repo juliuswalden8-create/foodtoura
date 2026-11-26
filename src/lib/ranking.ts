@@ -192,7 +192,8 @@ export function rankRestaurants(
           matchReasons.push(`Matches ${overlap.join(", ")}`);
           scoreExplain.push(`Cuisine overlap: ${overlap.join(", ")} (+)`);
         } else if (!wantsSurprise) {
-          softScore -= 14;
+          // Strong penalty so non-matching cuisines don't outrank true fits
+          softScore -= 36;
           scoreExplain.push("No cuisine overlap (−)");
           if (mandatory.cuisine) {
             hardExcluded = true;

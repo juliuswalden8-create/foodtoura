@@ -2,9 +2,9 @@ import type { Restaurant } from "./types";
 
 const img = {
   tapas:
-    "https://images.unsplash.com/photo-1515443961218-a595674c5778?w=1200&q=80",
+    "https://images.unsplash.com/photo-1476224203421-9ac39bcb3327?w=1200&q=80",
   paella:
-    "https://images.unsplash.com/photo-1534080564583-6da87748afd6?w=1200&q=80",
+    "https://images.unsplash.com/photo-1529042410759-befb1204b468?w=1200&q=80",
   seafood:
     "https://images.unsplash.com/photo-1559339352-11d035aa65de?w=1200&q=80",
   italian:

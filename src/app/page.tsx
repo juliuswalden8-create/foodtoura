@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { DemoModeBanner } from "@/components/DemoModeBanner";
+import { LocationSearch } from "@/components/LocationSearch";
 import {
   defaultDiscoveryState,
   loadDestination,
@@ -11,6 +12,7 @@ import {
   saveDiscoveryState,
 } from "@/lib/discovery-store";
 import { RESTAURANTS, DEMO_CITIES } from "@/lib/mock-restaurants";
+import { useRouter } from "next/navigation";
 
 const TRENDING = [
   {
@@ -35,6 +37,7 @@ const QUICK = [
 ];
 
 export default function HomePage() {
+  const router = useRouter();
   const [destination, setDestination] = useState<{
     city: string;
     country: string;
@@ -47,11 +50,13 @@ export default function HomePage() {
     setSavedCount(loadSavedIds().length);
   }, []);
 
-  function startCity(city: string, country: string) {
+  function startCity(city: string, country: string, navigate = false) {
     const state = defaultDiscoveryState();
     state.location.city = city;
     state.location.country = country;
     saveDiscoveryState(state);
+    setDestination({ city, country });
+    if (navigate) router.push("/discover");
   }
 
   function runAiSearch(e: React.FormEvent) {
@@ -105,16 +110,8 @@ export default function HomePage() {
               with. We&apos;ll help you discover restaurants that fit your
               journey.
             </p>
-            <div
-              className="animate-fade-up mt-7 flex flex-wrap gap-3"
-              style={{ animationDelay: "120ms" }}
-            >
-              <Link href="/guide" className="btn-primary">
-                Find my perfect restaurant
-              </Link>
-              <Link href="/discover" className="btn-secondary">
-                Guided wizard
-              </Link>
+            <div className="mt-7">
+              <LocationSearch />
             </div>
           </div>
         </div>
@@ -144,8 +141,7 @@ export default function HomePage() {
                   className={`chip text-xs ${destination?.city === c ? "chip-active" : "chip-idle"}`}
                   onClick={() => {
                     const country = c === "Lisbon" ? "Portugal" : "Spain";
-                    startCity(c, country);
-                    setDestination({ city: c, country });
+                    startCity(c, country, true);
                   }}
                 >
                   {c}
@@ -260,11 +256,7 @@ export default function HomePage() {
                 key={t.city}
                 type="button"
                 className="relative aspect-[16/9] overflow-hidden rounded-3xl text-left"
-                onClick={() => {
-                  startCity(t.city, t.country);
-                  setDestination({ city: t.city, country: t.country });
-                  window.location.href = "/discover";
-                }}
+                onClick={() => startCity(t.city, t.country, true)}
               >
                 <Image
                   src={t.image}
