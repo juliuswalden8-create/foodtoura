@@ -339,13 +339,13 @@ function GuideInner() {
   return (
     <div className="relative mx-auto flex min-h-[calc(100dvh-8rem)] max-w-2xl flex-col pb-28">
       {/* Header */}
-      <div className="sticky top-0 z-20 border-b border-mist/80 bg-cream/90 px-4 py-3 backdrop-blur-md dark:border-border dark:bg-[#1c2420]/90 sm:px-6">
+      <div className="sticky top-0 z-20 border-b border-[#E8DFD0] bg-[#FAF7F0]/95 px-4 py-3 backdrop-blur-md dark:border-[#3a4540] dark:bg-[#1c2420]/95 sm:px-6">
         <div className="flex items-center justify-between gap-3">
           <div>
-            <p className="text-xs font-medium uppercase tracking-wide text-terracotta">
+            <p className="text-xs font-medium uppercase tracking-wide text-[#C9856B]">
               Your local guide
             </p>
-            <h1 className="font-display text-xl font-semibold text-forest dark:text-cream sm:text-2xl">
+            <h1 className="font-display text-xl font-semibold text-[#344E41] dark:text-[#f4f1ea] sm:text-2xl">
               Let&apos;s find somewhere lovely.
             </h1>
           </div>
@@ -358,7 +358,7 @@ function GuideInner() {
           </button>
         </div>
         {liveHint && (
-          <p className="mt-2 text-[11px] leading-relaxed text-ink-muted">
+          <p className="mt-2 text-[11px] leading-relaxed text-[#62675E] dark:text-[#a8aea6]">
             {liveHint} Allergy safety is always checked carefully.
           </p>
         )}

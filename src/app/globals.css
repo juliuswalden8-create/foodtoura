@@ -83,34 +83,35 @@ body {
   }
 
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 rounded-full border border-mist bg-card px-5 py-3 text-sm font-semibold text-forest transition hover:border-forest/25 hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest dark:border-border dark:bg-card dark:text-cream dark:hover:bg-sand;
+    @apply inline-flex items-center justify-center gap-2 rounded-full border border-[#E8DFD0] bg-[#FFFDF9] px-5 py-3 text-sm font-semibold text-[#344E41] transition hover:border-[#344E41]/30 hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#344E41] dark:border-[#3a4540] dark:bg-[#2a3530] dark:text-[#f4f1ea] dark:hover:bg-[#324038];
   }
 
   .chip {
-    @apply inline-flex items-center gap-1.5 rounded-full border px-3.5 py-2 text-sm transition;
+    @apply inline-flex items-center gap-1.5 rounded-full border px-3.5 py-2 text-sm font-medium transition;
   }
 
+  /* Never use text-cream here — Tailwind cream is light and vanishes on white cards */
   .chip-idle {
-    @apply border-mist bg-card text-ink-soft hover:border-forest/25 dark:border-border dark:bg-card dark:text-cream;
+    @apply border-[#E8DFD0] bg-[#FFFDF9] text-[#344E41] hover:border-[#344E41]/35 hover:bg-white dark:border-[#3a4540] dark:bg-[#2a3530] dark:text-[#f4f1ea] dark:hover:bg-[#324038];
   }
 
   .chip-active {
-    @apply border-forest bg-forest text-cream;
+    @apply border-[#344E41] bg-[#344E41] text-white dark:border-[#879B7C] dark:bg-[#879B7C] dark:text-[#1c2420];
   }
 
   .input-field {
-    @apply w-full rounded-2xl border border-mist bg-card px-4 py-3.5 text-ink outline-none transition placeholder:text-ink-muted focus:border-forest/35 focus:ring-2 focus:ring-forest/10 dark:border-border dark:bg-sand dark:text-cream dark:placeholder:text-ink-muted;
+    @apply w-full rounded-2xl border border-[#E8DFD0] bg-[#FFFDF9] px-4 py-3.5 text-[#303A32] outline-none transition placeholder:text-[#7A7F76] focus:border-[#344E41]/35 focus:ring-2 focus:ring-[#344E41]/10 dark:border-[#3a4540] dark:bg-[#2a3530] dark:text-[#f4f1ea] dark:placeholder:text-[#a8aea6];
   }
 
   .card-surface {
-    @apply rounded-3xl border border-mist/90 bg-card shadow-card dark:border-border;
+    @apply rounded-3xl border border-[#E8DFD0]/90 bg-[#FFFDF9] shadow-card dark:border-[#3a4540] dark:bg-[#24302a];
   }
 
   .msg-user {
-    @apply ml-auto max-w-[85%] rounded-3xl rounded-br-lg bg-forest px-4 py-3 text-sm leading-relaxed text-cream;
+    @apply ml-auto max-w-[85%] rounded-3xl rounded-br-lg bg-[#344E41] px-4 py-3 text-sm leading-relaxed text-white;
   }
 
   .msg-assistant {
-    @apply mr-auto max-w-[90%] rounded-3xl rounded-bl-lg border border-mist bg-card px-4 py-3 text-sm leading-relaxed text-ink shadow-card dark:border-border;
+    @apply mr-auto max-w-[90%] rounded-3xl rounded-bl-lg border border-[#E8DFD0] bg-[#FFFDF9] px-4 py-3 text-sm leading-relaxed text-[#303A32] shadow-card dark:border-[#3a4540] dark:bg-[#2a3530] dark:text-[#f4f1ea];
   }
 }
