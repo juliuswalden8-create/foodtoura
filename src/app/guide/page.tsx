@@ -49,14 +49,20 @@ function GuideInner() {
             country:
               parsed.country ||
               s.location.country ||
-              (parsed.city === "Lisbon" ? "Portugal" : parsed.city === "Barcelona" ? "Spain" : s.location.country),
+              (parsed.city === "Lisbon"
+                ? "Portugal"
+                : parsed.city === "Barcelona" || parsed.city === "Marbella"
+                  ? "Spain"
+                  : s.location.country),
             neighborhood: parsed.neighborhood || s.location.neighborhood,
+            maxDistanceKm:
+              parsed.maxDistanceKm ?? s.location.maxDistanceKm,
           },
           guests: {
             ...s.guests,
-            adults: parsed.partySize
-              ? Math.max(s.guests.adults, parsed.partySize)
-              : s.guests.adults,
+            adults: parsed.partySize ?? s.guests.adults,
+            children: parsed.children ?? s.guests.children,
+            infants: parsed.infants ?? s.guests.infants,
           },
           food: {
             ...s.food,
@@ -72,6 +78,12 @@ function GuideInner() {
             maxBudgetGroup: parsed.maxBudgetGroup ?? s.food.maxBudgetGroup,
             accessibilityNeeds:
               parsed.accessibilityNeeds ?? s.food.accessibilityNeeds,
+            atmosphere: Array.from(
+              new Set([
+                ...(s.food.atmosphere || []),
+                ...(parsed.atmosphere || []),
+              ]),
+            ),
             parsedNotes: parsed.notes,
           },
           allergens: (() => {

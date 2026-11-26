@@ -5,6 +5,7 @@ import type {
   SelectedAllergen,
 } from "./types";
 import { ALLERGEN_SHORT } from "./allergens";
+import { tasteScoreDelta, type TasteProfile } from "./taste-profile";
 
 function haversineKm(
   lat1: number,
@@ -27,6 +28,11 @@ function cityCenter(city: string): { lat: number; lng: number } {
   const centers: Record<string, { lat: number; lng: number }> = {
     Barcelona: { lat: 41.3874, lng: 2.1686 },
     Lisbon: { lat: 38.7223, lng: -9.1393 },
+    Madrid: { lat: 40.4168, lng: -3.7038 },
+    Marbella: { lat: 36.5101, lng: -4.8825 },
+    Paris: { lat: 48.8566, lng: 2.3522 },
+    Rome: { lat: 41.9028, lng: 12.4964 },
+    London: { lat: 51.5074, lng: -0.1278 },
   };
   return centers[city] ?? centers.Barcelona;
 }
@@ -98,6 +104,7 @@ function evaluateAllergy(
 export function rankRestaurants(
   restaurants: Restaurant[],
   state: DiscoveryState,
+  taste?: TasteProfile,
 ): RankedRestaurant[] {
   const center =
     state.location.lat != null && state.location.lng != null
@@ -269,22 +276,47 @@ export function rankRestaurants(
         }
       }
 
-      // Group / kids
+      // Group / kids — unknown ≠ confirmed fit
       if (partySize >= 6) {
         if (r.acceptsLargeGroups) {
           softScore += 10;
           matchReasons.push("Welcomes large groups");
           scoreExplain.push("Large group fit (+)");
+        } else if (r.dataCompleteness < 0.5) {
+          softScore -= 8;
+          missingDataFlags.push("Group availability needs confirmation");
+          scoreExplain.push("Group size unknown — confirm (−)");
         } else {
           softScore -= 22;
-          scoreExplain.push("Large groups not supported (−)");
+          missingDataFlags.push("Group availability needs confirmation");
+          scoreExplain.push("Large groups not listed (−)");
         }
       }
       if (state.guests.children > 0 || state.guests.infants > 0) {
         if (r.childFriendly) {
           softScore += 6;
           matchReasons.push("Child-friendly");
-        } else softScore -= 8;
+        } else {
+          softScore -= 8;
+          missingDataFlags.push("Family suitability needs confirmation");
+        }
+      }
+
+      // Atmosphere tags from mood / NL
+      const moods = state.food.atmosphere || [];
+      if (moods.includes("romantic") || moods.includes("quiet")) {
+        if (r.quietAtmosphere) {
+          softScore += 8;
+          matchReasons.push("Quiet / intimate atmosphere");
+        } else if (r.livelyAtmosphere) softScore -= 4;
+      }
+      if (moods.includes("family") && r.childFriendly) {
+        softScore += 6;
+        matchReasons.push("Family-friendly vibe");
+      }
+      if (moods.includes("formal") && r.cuisine.includes("Fine dining")) {
+        softScore += 6;
+        matchReasons.push("Celebratory / fine dining");
       }
 
       // Ratings & reliability (capped — never a safety signal)
@@ -303,8 +335,22 @@ export function rankRestaurants(
           matchReasons.push("Lower tourist-trap risk (estimate)");
           scoreExplain.push(`Authenticity ~${r.authenticityScore} (+)`);
         } else if (r.touristTrapRisk === "high") {
-          scoreExplain.push(`Tourist-trap risk high · authenticity ~${r.authenticityScore} (−)`);
+          scoreExplain.push(
+            `Tourist-trap risk high · authenticity ~${r.authenticityScore} (−)`,
+          );
         }
+      }
+
+      // Food Tinder taste profile (soft only)
+      if (taste && taste.swipes > 0) {
+        const { delta, reason } = tasteScoreDelta(
+          r.cuisine,
+          r.highlights,
+          taste,
+        );
+        softScore += delta;
+        if (reason) matchReasons.push(reason);
+        if (delta !== 0) scoreExplain.push(`Taste profile ${delta > 0 ? "+" : ""}${delta}`);
       }
 
       if (

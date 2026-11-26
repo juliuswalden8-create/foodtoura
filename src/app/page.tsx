@@ -29,16 +29,22 @@ const TRENDING = [
   },
 ];
 
-const QUICK = [
-  { href: "/guide", title: "AI Guide", body: "Describe dinner in plain language" },
-  { href: "/group", title: "Group Match", body: "Merge everyone's prefs safely" },
-  { href: "/vote", title: "Group vote", body: "Yes / maybe / no on matches" },
-  { href: "/recommend", title: "AI picks", body: "Explainable recommendations" },
-  { href: "/passport", title: "Allergy Passport", body: "Show staff in their language" },
-  { href: "/phrases", title: "Phrase book", body: "Tell the kitchen clearly" },
-  { href: "/scanner", title: "Menu Scanner", body: "Flag allergens in a menu" },
-  { href: "/plan", title: "Tonight's plan", body: "Stack stops for the evening" },
-  { href: "/trip", title: "Share trip", body: "Send prefs as a link" },
+const PRIMARY_TOOLS = [
+  { href: "/mood", title: "Mood Match", body: "Romantic, cozy, family…" },
+  { href: "/group", title: "Group Match", body: "Merge prefs safely" },
+  { href: "/passport", title: "Allergy Passport", body: "Show staff clearly" },
+  { href: "/scanner", title: "Menu Scanner", body: "Flag allergens in text" },
+];
+
+const MORE_TOOLS = [
+  { href: "/tinder", title: "Food Tinder", body: "Train your taste" },
+  { href: "/local", title: "Eat Like a Local", body: "Regional dishes" },
+  { href: "/surprise", title: "Surprise Me", body: "One eligible pick" },
+  { href: "/waiter", title: "AI Waiter", body: "Table phrases" },
+  { href: "/journal", title: "Food Passport", body: "Visit journal" },
+  { href: "/bill", title: "Bill split", body: "Tips & shares" },
+  { href: "/plan", title: "Tonight's plan", body: "Stack stops" },
+  { href: "/vote", title: "Group vote", body: "Yes / maybe / no" },
 ];
 
 export default function HomePage() {
@@ -185,13 +191,16 @@ export default function HomePage() {
           )}
         </section>
 
-        {/* Quick features */}
+        {/* Secondary tools — discovery stays hero-first */}
         <section>
           <h2 className="font-display text-2xl font-semibold text-forest dark:text-cream">
-            Quick features
+            Travel tools
           </h2>
-          <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {QUICK.map((q) => (
+          <p className="mt-1 text-sm text-ink-muted">
+            Use after you know where you&apos;re eating — or to set the mood.
+          </p>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            {PRIMARY_TOOLS.map((q) => (
               <Link
                 key={q.href}
                 href={q.href}
@@ -204,6 +213,25 @@ export default function HomePage() {
               </Link>
             ))}
           </div>
+          <details className="mt-4">
+            <summary className="cursor-pointer text-sm font-semibold text-forest-mid">
+              More tools
+            </summary>
+            <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              {MORE_TOOLS.map((q) => (
+                <Link
+                  key={q.href}
+                  href={q.href}
+                  className="rounded-2xl border border-mist/80 px-4 py-3 text-sm dark:border-white/10"
+                >
+                  <p className="font-semibold text-forest dark:text-cream">
+                    {q.title}
+                  </p>
+                  <p className="text-ink-muted">{q.body}</p>
+                </Link>
+              ))}
+            </div>
+          </details>
         </section>
 
         {/* Personalized / local discoveries */}

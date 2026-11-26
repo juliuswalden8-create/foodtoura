@@ -166,8 +166,9 @@ function placeToRestaurant(
   const lng = p.location?.longitude ?? 0;
   const priceLevel = mapPriceLevel(p.priceLevel);
   const photoRef = p.photos?.[0]?.name;
+  // Never put API keys in client-visible URLs — proxy through our API.
   const imageUrl = photoRef
-    ? `https://places.googleapis.com/v1/${photoRef}/media?maxHeightPx=800&key=${liveKey()}`
+    ? `/api/places/photo?name=${encodeURIComponent(photoRef)}&h=800`
     : "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1200&q=80";
 
   return {
@@ -278,8 +279,14 @@ class GooglePlacesProvider implements RestaurantProvider {
 
     if (!res.ok) {
       const detail = await res.text().catch(() => "");
+      const hint =
+        res.status === 403
+          ? " Check billing, API enablement, and key restrictions."
+          : res.status === 429
+            ? " Rate limited — retry shortly."
+            : "";
       throw new Error(
-        `Google Places error ${res.status}: ${detail.slice(0, 200) || res.statusText}`,
+        `Google Places error ${res.status}: ${detail.slice(0, 200) || res.statusText}.${hint}`,
       );
     }
 
@@ -288,6 +295,15 @@ class GooglePlacesProvider implements RestaurantProvider {
       .map((p) => placeToRestaurant(p, query.city || ""))
       .filter((r): r is Restaurant => Boolean(r))
       .map(enrichAuthenticity);
+
+    if (restaurants.length === 0) {
+      return {
+        mode: "live",
+        restaurants: [],
+        attribution: LIVE_ATTRIBUTION,
+        cachedAt: new Date().toISOString(),
+      };
+    }
 
     const result: ProviderResult = {
       mode: "live",

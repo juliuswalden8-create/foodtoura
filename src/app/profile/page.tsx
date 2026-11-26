@@ -3,6 +3,24 @@
 import Link from "next/link";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { DemoModeBanner } from "@/components/DemoModeBanner";
+import { resetTaste } from "@/lib/taste-profile";
+
+const LINKS = [
+  { href: "/guide", label: "AI Guide" },
+  { href: "/tinder", label: "Food Tinder / taste" },
+  { href: "/mood", label: "Mood Match" },
+  { href: "/group", label: "Group Match" },
+  { href: "/vote", label: "Group vote" },
+  { href: "/passport", label: "Allergy Passport" },
+  { href: "/scanner", label: "Menu Scanner" },
+  { href: "/local", label: "Eat Like a Local" },
+  { href: "/waiter", label: "AI Waiter" },
+  { href: "/journal", label: "Food Passport journal" },
+  { href: "/plan", label: "Tonight's plan" },
+  { href: "/bill", label: "Bill split" },
+  { href: "/trip", label: "Share trip" },
+  { href: "/saved", label: "Saved" },
+];
 
 export default function ProfilePage() {
   return (
@@ -11,8 +29,7 @@ export default function ProfilePage() {
         Profile
       </h1>
       <p className="mt-2 text-ink-soft">
-        Guests can discover without an account. Sign-in lands in a later slice
-        for synced trips and group votes.
+        Guest mode — prefs and saves stay on this device. Accounts sync later.
       </p>
 
       <div className="mt-5">
@@ -28,48 +45,40 @@ export default function ProfilePage() {
           <ThemeToggle />
         </div>
         <div className="border-t border-mist pt-4 dark:border-white/10">
-          <p className="font-semibold text-forest dark:text-cream">Guest mode</p>
+          <p className="font-semibold text-forest dark:text-cream">Taste profile</p>
           <p className="mt-1 text-sm text-ink-muted">
-            Preferences and saves stay on this device (session + local storage).
+            Food Tinder likes reshape soft ranking only — never allergy safety.
+          </p>
+          <button
+            type="button"
+            className="btn-secondary mt-3 !py-2 text-xs"
+            onClick={() => resetTaste()}
+          >
+            Reset taste profile
+          </button>
+        </div>
+        <div className="border-t border-mist pt-4 dark:border-white/10">
+          <p className="font-semibold text-forest dark:text-cream">Privacy</p>
+          <p className="mt-1 text-sm text-ink-muted">
+            Clear site data in your browser to delete local prefs, saves, journal
+            and votes. Account deletion arrives with authenticated profiles.
           </p>
         </div>
         <div className="border-t border-mist pt-4 dark:border-white/10">
-          <p className="font-semibold text-forest dark:text-cream">Data</p>
+          <p className="font-semibold text-forest dark:text-cream">Live data</p>
           <p className="mt-1 text-sm text-ink-muted">
-            Currently running in fictional demo mode. Live Places requires an
-            API key and never mixes with demo listings.
+            Set <code className="text-xs">GOOGLE_PLACES_API_KEY</code> server-side
+            for real listings. Demo and live never mix.
           </p>
         </div>
       </div>
 
       <div className="mt-6 flex flex-wrap gap-3">
-        <Link href="/guide" className="btn-primary">
-          Open AI Guide
-        </Link>
-        <Link href="/group" className="btn-secondary">
-          Group Match
-        </Link>
-        <Link href="/passport" className="btn-secondary">
-          Allergy Passport
-        </Link>
-        <Link href="/scanner" className="btn-secondary">
-          Menu Scanner
-        </Link>
-        <Link href="/recommend" className="btn-secondary">
-          AI picks
-        </Link>
-        <Link href="/vote" className="btn-secondary">
-          Group vote
-        </Link>
-        <Link href="/plan" className="btn-secondary">
-          Tonight&apos;s plan
-        </Link>
-        <Link href="/phrases" className="btn-secondary">
-          Phrase book
-        </Link>
-        <Link href="/trip" className="btn-secondary">
-          Share trip
-        </Link>
+        {LINKS.map((l) => (
+          <Link key={l.href} href={l.href} className="btn-secondary">
+            {l.label}
+          </Link>
+        ))}
       </div>
     </div>
   );

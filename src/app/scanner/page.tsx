@@ -28,18 +28,38 @@ export default function ScannerPage() {
 
   async function onFile(file: File | null) {
     if (!file) return;
-    // Image OCR not wired without a vision API key — extract text if .txt, else guide user
+    // Image OCR not wired without a vision API key — extract text if .txt, else fail honestly
     if (file.type.startsWith("text/") || file.name.endsWith(".txt")) {
       const content = await file.text();
       setText(content);
       await runScan(content);
       return;
     }
+    if (file.size > 12 * 1024 * 1024) {
+      setResult({
+        hits: [],
+        dishes: [],
+        disclaimer:
+          "File too large (max 12MB). Retake a clearer, smaller photo or paste text. No fake menu was generated.",
+        engine: "heuristic-v1",
+      });
+      return;
+    }
+    if (!file.type.startsWith("image/")) {
+      setResult({
+        hits: [],
+        dishes: [],
+        disclaimer:
+          "Unsupported file type. Upload JPG/PNG/WebP or a .txt menu, or paste text. No fake menu was generated.",
+        engine: "heuristic-v1",
+      });
+      return;
+    }
     setResult({
       hits: [],
       dishes: [],
       disclaimer:
-        "Image OCR requires a vision/OCR API key (not configured). Paste menu text, or add an OCR provider later. Do not assume a photo scan is safe.",
+        "Photo received, but vision/OCR is not configured (needs a vision API key). We did not invent a menu from this image. Paste readable text, or add OCR credentials to unlock photo scanning.",
       engine: "heuristic-v1",
     });
   }

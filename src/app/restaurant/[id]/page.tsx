@@ -138,6 +138,15 @@ export default function RestaurantDetailPage() {
             >
               Add to tonight
             </button>
+            <Link href="/passport" className="btn-secondary !py-2 text-xs">
+              Allergy Passport
+            </Link>
+            <Link href="/waiter" className="btn-secondary !py-2 text-xs">
+              AI Waiter
+            </Link>
+            <Link href="/journal" className="btn-secondary !py-2 text-xs">
+              Log visit
+            </Link>
           </div>
         </div>
 

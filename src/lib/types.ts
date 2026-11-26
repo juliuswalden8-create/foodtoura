@@ -192,13 +192,23 @@ export interface ParsedPreferences {
   maxBudgetPerPerson?: number;
   maxBudgetGroup?: number;
   partySize?: number;
+  children?: number;
+  infants?: number;
   allergens: SelectedAllergen[];
   dietary: DietaryPreference[];
   atmosphere?: AtmosphereTag[];
   seating?: SeatingPref[];
   accessibilityNeeds?: boolean;
+  maxDistanceKm?: number;
   notes: string[];
 }
+
+export type ResultsSort =
+  | "best"
+  | "distance"
+  | "price"
+  | "rating"
+  | "open";
 
 export type ResultsViewMode = "list" | "map" | "swipe";
 
