@@ -1,0 +1,71 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --cream: #faf8f3;
+  --forest: #173f35;
+  --terracotta: #e87950;
+  --charcoal: #1c1c1a;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--cream);
+  color: var(--charcoal);
+  min-height: 100dvh;
+}
+
+::selection {
+  background: rgba(232, 121, 80, 0.28);
+}
+
+@layer utilities {
+  .skeleton {
+    background: linear-gradient(
+      90deg,
+      #efeae0 0%,
+      #e4ddd0 45%,
+      #efeae0 100%
+    );
+    background-size: 200% 100%;
+    @apply animate-shimmer rounded-xl;
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-full bg-terracotta px-6 py-3.5 text-sm font-semibold text-white shadow-soft transition hover:bg-terracotta-deep focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-terracotta disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-full border border-forest/15 bg-white/70 px-5 py-3 text-sm font-semibold text-forest transition hover:border-forest/30 hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest;
+  }
+
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-full border px-3.5 py-2 text-sm transition;
+  }
+
+  .chip-idle {
+    @apply border-mist bg-white/80 text-charcoal-soft hover:border-forest/25;
+  }
+
+  .chip-active {
+    @apply border-forest bg-forest text-cream;
+  }
+
+  .input-field {
+    @apply w-full rounded-2xl border border-mist bg-white px-4 py-3.5 text-charcoal outline-none transition placeholder:text-charcoal-muted focus:border-forest/40 focus:ring-2 focus:ring-forest/10;
+  }
+
+  .card-surface {
+    @apply rounded-3xl border border-mist/80 bg-white shadow-card;
+  }
+}
