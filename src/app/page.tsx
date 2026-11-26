@@ -31,9 +31,11 @@ const TRENDING = [
 
 const QUICK = [
   { href: "/guide", title: "AI Guide", body: "Describe dinner in plain language" },
-  { href: "/discover", title: "Guided match", body: "Step-by-step discovery wizard" },
-  { href: "/explore", title: "Explore map", body: "Browse demo cities & cuisines" },
-  { href: "/saved", title: "Saved", body: "Your shortlist for the trip" },
+  { href: "/group", title: "Group Match", body: "Merge everyone's prefs safely" },
+  { href: "/recommend", title: "AI picks", body: "Explainable recommendations" },
+  { href: "/passport", title: "Allergy Passport", body: "Show staff in their language" },
+  { href: "/scanner", title: "Menu Scanner", body: "Flag allergens in a menu" },
+  { href: "/explore", title: "Explore", body: "Browse demo cities & cuisines" },
 ];
 
 export default function HomePage() {
@@ -185,7 +187,7 @@ export default function HomePage() {
           <h2 className="font-display text-2xl font-semibold text-forest dark:text-cream">
             Quick features
           </h2>
-          <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {QUICK.map((q) => (
               <Link
                 key={q.href}

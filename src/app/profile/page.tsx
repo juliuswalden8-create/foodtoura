@@ -46,8 +46,17 @@ export default function ProfilePage() {
         <Link href="/guide" className="btn-primary">
           Open AI Guide
         </Link>
-        <Link href="/discover" className="btn-secondary">
-          Discovery wizard
+        <Link href="/group" className="btn-secondary">
+          Group Match
+        </Link>
+        <Link href="/passport" className="btn-secondary">
+          Allergy Passport
+        </Link>
+        <Link href="/scanner" className="btn-secondary">
+          Menu Scanner
+        </Link>
+        <Link href="/recommend" className="btn-secondary">
+          AI picks
         </Link>
       </div>
     </div>
