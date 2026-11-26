@@ -1,6 +1,32 @@
 import type { DiscoveryState } from "./types";
 import { defaultDiscoveryState } from "./discovery-store";
 
+/** Portable base64url — avoids Buffer "base64url" which breaks in browser polyfills. */
+function toBase64Url(text: string): string {
+  if (typeof btoa === "function") {
+    return btoa(unescape(encodeURIComponent(text)))
+      .replace(/\+/g, "-")
+      .replace(/\//g, "_")
+      .replace(/=+$/, "");
+  }
+  // Node without browser globals
+  return Buffer.from(text, "utf8")
+    .toString("base64")
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=+$/, "");
+}
+
+function fromBase64Url(token: string): string {
+  const b64 = token.replace(/-/g, "+").replace(/_/g, "/");
+  const pad = b64.length % 4 === 0 ? "" : "=".repeat(4 - (b64.length % 4));
+  const padded = b64 + pad;
+  if (typeof atob === "function") {
+    return decodeURIComponent(escape(atob(padded)));
+  }
+  return Buffer.from(padded, "base64").toString("utf8");
+}
+
 /** Compact shareable trip payload (URL hash / query). */
 export function encodeTrip(state: DiscoveryState): string {
   const compact = {
@@ -22,26 +48,12 @@ export function encodeTrip(state: DiscoveryState): string {
     di: state.dietary,
     ft: state.food.freeText?.slice(0, 280),
   };
-  const json = JSON.stringify(compact);
-  if (typeof Buffer !== "undefined") {
-    return Buffer.from(json, "utf8").toString("base64url");
-  }
-  return btoa(unescape(encodeURIComponent(json)))
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_")
-    .replace(/=+$/, "");
+  return toBase64Url(JSON.stringify(compact));
 }
 
 export function decodeTrip(token: string): DiscoveryState | null {
   try {
-    let json: string;
-    if (typeof Buffer !== "undefined") {
-      json = Buffer.from(token, "base64url").toString("utf8");
-    } else {
-      const b64 = token.replace(/-/g, "+").replace(/_/g, "/");
-      json = decodeURIComponent(escape(atob(b64)));
-    }
-    const c = JSON.parse(json);
+    const c = JSON.parse(fromBase64Url(token));
     const state = defaultDiscoveryState();
     state.location.city = c.c || "";
     state.location.country = c.co || "";
