@@ -2,13 +2,25 @@ import { NextResponse } from "next/server";
 import { defaultDiscoveryState } from "@/lib/discovery-store";
 import { getDataMode, searchRestaurantsForState } from "@/lib/provider";
 import { describeNoFullMatch, rankRestaurants } from "@/lib/ranking";
+import { allowRequest, clientKey } from "@/lib/rate-limit";
 import type { DiscoveryState } from "@/lib/types";
+
+const DISCOVER_LIMIT = 20;
+const DISCOVER_WINDOW_MS = 60_000;
 
 /**
  * Server-side discover — Google Places key never leaves the server.
  * Returns raw `restaurants` for client re-ranking + ranked `results`.
  */
 export async function POST(request: Request) {
+  const ip = clientKey(request);
+  if (!allowRequest(`discover:${ip}`, DISCOVER_LIMIT, DISCOVER_WINDOW_MS)) {
+    return NextResponse.json(
+      { error: "Too many discovery requests. Try again shortly." },
+      { status: 429, headers: { "Retry-After": "60" } },
+    );
+  }
+
   try {
     const body = (await request.json()) as Partial<DiscoveryState>;
     const base = defaultDiscoveryState();

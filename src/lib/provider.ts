@@ -221,6 +221,15 @@ function placeToRestaurant(
 /** In-memory TTL cache — never mixes demo IDs into live responses */
 const liveCache = new Map<string, { at: number; result: ProviderResult }>();
 const CACHE_TTL_MS = 5 * 60 * 1000;
+const CACHE_MAX_ENTRIES = 64;
+
+function setLiveCache(key: string, result: ProviderResult) {
+  if (liveCache.size >= CACHE_MAX_ENTRIES) {
+    const first = liveCache.keys().next().value;
+    if (first !== undefined) liveCache.delete(first);
+  }
+  liveCache.set(key, { at: Date.now(), result });
+}
 
 class GooglePlacesProvider implements RestaurantProvider {
   mode = "live" as const;
@@ -311,7 +320,7 @@ class GooglePlacesProvider implements RestaurantProvider {
       attribution: LIVE_ATTRIBUTION,
       cachedAt: new Date().toISOString(),
     };
-    liveCache.set(cacheKey, { at: Date.now(), result });
+    setLiveCache(cacheKey, result);
     return result;
   }
 

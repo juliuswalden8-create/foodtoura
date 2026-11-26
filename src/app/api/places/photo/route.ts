@@ -1,10 +1,67 @@
 import { NextRequest, NextResponse } from "next/server";
+import { allowRequest, clientKey } from "@/lib/rate-limit";
 
 /**
  * Proxies Places photo media so the API key never appears in client HTML.
- * Usage: /api/places/photo?name=places%2F...%2Fphotos%2F...
+ *
+ * Strict allowlist: only `places/{id}/photos/{id}` with safe charset.
+ * Rebuilds the path from capture groups — never pastes raw visitor input
+ * into the upstream URL (blocks encoded ".." SSRF).
  */
+
+const PHOTO_NAME_RE =
+  /^places\/([A-Za-z0-9_-]{1,256})\/photos\/([A-Za-z0-9_-]{1,512})$/;
+
+function sanitizePlacesPhotoName(raw: string | null): {
+  placeId: string;
+  photoId: string;
+} | null {
+  if (!raw || raw.length > 800) return null;
+
+  let decoded = raw;
+  for (let i = 0; i < 5; i++) {
+    try {
+      const next = decodeURIComponent(decoded.replace(/\+/g, " "));
+      if (next === decoded) break;
+      decoded = next;
+    } catch {
+      return null;
+    }
+  }
+
+  // Reject any traversal / encoding residue after full decode
+  if (
+    decoded.includes("..") ||
+    decoded.includes("\\") ||
+    decoded.includes("%") ||
+    decoded.includes("?") ||
+    decoded.includes("#") ||
+    decoded.includes("//") ||
+    /\s/.test(decoded)
+  ) {
+    return null;
+  }
+
+  const m = PHOTO_NAME_RE.exec(decoded);
+  if (!m) return null;
+  return { placeId: m[1], photoId: m[2] };
+}
+
 export async function GET(req: NextRequest) {
+  const ip = clientKey(req);
+  if (!allowRequest(`photo:${ip}`, 40, 60_000)) {
+    return NextResponse.json(
+      { error: "Too many photo requests. Try again shortly." },
+      { status: 429, headers: { "Retry-After": "60" } },
+    );
+  }
+
+  // Validate before touching secrets so bad names always 400
+  const parsed = sanitizePlacesPhotoName(req.nextUrl.searchParams.get("name"));
+  if (!parsed) {
+    return NextResponse.json({ error: "Invalid photo name" }, { status: 400 });
+  }
+
   const key =
     process.env.GOOGLE_PLACES_API_KEY ||
     process.env.PLACES_API_KEY ||
@@ -16,18 +73,27 @@ export async function GET(req: NextRequest) {
     );
   }
 
-  const name = req.nextUrl.searchParams.get("name");
   const maxHeightPx = Math.min(
     1600,
-    Math.max(100, Number(req.nextUrl.searchParams.get("h") || 800)),
+    Math.max(100, Number(req.nextUrl.searchParams.get("h") || 800) || 800),
   );
-  if (!name || !name.startsWith("places/") || name.includes("..")) {
-    return NextResponse.json({ error: "Invalid photo name" }, { status: 400 });
-  }
 
-  const url = `https://places.googleapis.com/v1/${name}/media?maxHeightPx=${maxHeightPx}&key=${encodeURIComponent(key)}`;
+  // Rebuild path from validated IDs only — never interpolate raw input
+  const upstream = new URL(
+    `https://places.googleapis.com/v1/places/${parsed.placeId}/photos/${parsed.photoId}/media`,
+  );
+  upstream.searchParams.set("maxHeightPx", String(maxHeightPx));
+  upstream.searchParams.set("key", key);
+
   try {
-    const res = await fetch(url, { redirect: "follow" });
+    // Do not follow redirects (prevents open redirect / host jump)
+    const res = await fetch(upstream.toString(), { redirect: "manual" });
+    if (res.status >= 300 && res.status < 400) {
+      return NextResponse.json(
+        { error: "Unexpected redirect from photo host" },
+        { status: 502 },
+      );
+    }
     if (!res.ok) {
       return NextResponse.json(
         { error: `Photo fetch failed (${res.status})` },
